@@ -1,0 +1,86 @@
+{
+  "lastChangelogVersion": "0.84.2",
+  "theme": "dark",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.6-luna",
+  "defaultThinkingLevel": "max",
+  "collapseChangelog": true,
+  "quietStartup": true,
+  "shellCommandPrefix": "unset NODENV_VERSION",
+  "enableInstallTelemetry": false,
+  "defaultProjectTrust": "always",
+  "doubleEscapeAction": "tree",
+  "treeFilterMode": "default",
+  "hideThinkingBlock": true,
+  "packages": [
+    "npm:pi-subagents",
+    "npm:pi-lens",
+    "npm:pi-mcp-adapter",
+    "npm:pi-continue",
+    "npm:pi-web-access",
+    "npm:@juicesharp/rpiv-todo",
+    "npm:@narumitw/pi-btw"
+  ],
+  "subagents": {
+    "agentOverrides": {
+      "scout": {
+        "model": "openai-codex/gpt-5.6-luna",
+        "thinking": "xhigh",
+        "tools": [
+          "read",
+          "grep",
+          "find",
+          "ls"
+        ]
+      },
+      "delegate": {
+        "model": "openai-codex/gpt-5.6-luna",
+        "thinking": "xhigh"
+      },
+      "researcher": {
+        "model": "openai-codex/gpt-5.6-terra",
+        "thinking": "high",
+        "tools": [
+          "read",
+          "web_search",
+          "fetch_content",
+          "get_search_content"
+        ]
+      },
+      "worker": {
+        "model": "openai-codex/gpt-5.6-terra",
+        "thinking": "xhigh"
+      },
+      "reviewer": {
+        "model": "openai-codex/gpt-5.6-sol",
+        "thinking": "xhigh",
+        "tools": [
+          "read",
+          "grep",
+          "find",
+          "ls"
+        ]
+      },
+      "oracle": {
+        "model": "openai-codex/gpt-5.6-sol",
+        "thinking": "max",
+        "tools": [
+          "read",
+          "grep",
+          "find",
+          "ls"
+        ]
+      }
+    },
+    "watchdog": {
+      "enabled": false,
+      "main": {
+        "enabled": false,
+        "model": "quotio-gpt/gpt-5.6-terra",
+        "thinking": "xhigh"
+      }
+    }
+  },
+  "tuiMode": "regular",
+  "transport": "auto"
+}

@@ -1,0 +1,15 @@
+# Ignore all Pi state by default.
+*
+
+# Keep this ignore policy and the shared instructions.
+!.gitignore
+!AGENTS.md
+
+# Keep the selected configuration and custom code.
+!agent/
+!agent/settings.json
+!agent/extensions/
+!agent/extensions/**
+agent/extensions/orca-*
+!agent/chains/
+!agent/chains/**
