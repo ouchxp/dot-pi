@@ -1,15 +1,13 @@
-# Ignore all Pi state by default.
-*
+# Local Pi runtime state.
+agent/auth.json
+agent/bin/
+agent/missions/
+agent/models-store.json
+agent/models.json
+agent/npm/
+agent/run-history.jsonl
+agent/sessions/
+web-search-cache/
 
-# Keep this ignore policy and the shared instructions.
-!.gitignore
-!AGENTS.md
-
-# Keep the selected configuration and custom code.
-!agent/
-!agent/settings.json
-!agent/extensions/
-!agent/extensions/**
+# Local-only extensions.
 agent/extensions/orca-*
-!agent/chains/
-!agent/chains/**
