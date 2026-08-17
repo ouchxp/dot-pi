@@ -6,6 +6,13 @@ Batch independent tool calls in the same assistant turn; do not wait between ind
 - Never add `pi-lens-ignore` comments, `lens_diagnostic_mark` suppress/defer dispositions, or any other inline suppression to silence automated checks — unless the user explicitly asks for it.
 - Let the user decide whether to track or fix findings separately; report honestly (file, line, rule, one-line reason).
 
+## Subagent Runs — No Attention Looping
+
+- After launching an async subagent, arm the wait subscription **once** and return control. Do not re-arm, re-check status, or steer on repeated "needs attention" wakes.
+- A "needs attention" wake is a notification, not a poll. Check `subagent_supervisor pending` once; if empty, ignore the wake — the completion wake arrives on its own.
+- Only act when the run is genuinely stuck: the attention threshold fires AND a steer gets no response. Then steer once with a concrete question, or interrupt.
+- Never run status/polling loops or repeatedly inspect session files to "watch" a run. Long thinking phases (max-effort models) are normal.
+
 ## Subagent Delegation
 
 Use subagents dynamically when they materially improve the result. Do not delegate trivial tasks.
