@@ -1,0 +1,13 @@
+{
+  "fullCodeMode": true,
+  "capture": {
+    "keepVisible": [
+      "fabric_exec",
+      "subagent"
+    ]
+  },
+  "agents": {
+    "enabled": false
+  },
+  "configVersion": 3
+}
