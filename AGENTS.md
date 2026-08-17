@@ -1,3 +1,5 @@
+Batch independent tool calls in the same assistant turn; do not wait between independent reads/greps/bash calls.
+
 ## Subagent Delegation
 
 Use subagents dynamically when they materially improve the result. Do not delegate trivial tasks.
