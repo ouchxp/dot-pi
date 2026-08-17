@@ -1,5 +1,11 @@
 Batch independent tool calls in the same assistant turn; do not wait between independent reads/greps/bash calls.
 
+## pi-lens Rules
+
+- The pi-lens automated check (🔴/⚠️ messages after edits) scans edited files and may flag issues that predate the change. A finding on the file does not mean the change introduced it.
+- Never add `pi-lens-ignore` comments, `lens_diagnostic_mark` suppress/defer dispositions, or any other inline suppression to silence automated checks — unless the user explicitly asks for it.
+- Let the user decide whether to track or fix findings separately; report honestly (file, line, rule, one-line reason).
+
 ## Subagent Delegation
 
 Use subagents dynamically when they materially improve the result. Do not delegate trivial tasks.
