@@ -19,7 +19,10 @@
     "npm:pi-continue",
     "npm:pi-web-access",
     "npm:@juicesharp/rpiv-todo",
-    "npm:@narumitw/pi-btw"
+    "npm:@narumitw/pi-btw",
+    "npm:@juicesharp/rpiv-ask-user-question",
+    "npm:@dietrichgebert/ponytail",
+    "npm:pi-fabric"
   ],
   "subagents": {
     "agentOverrides": {
