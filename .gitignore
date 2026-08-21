@@ -11,3 +11,5 @@ web-search-cache/
 
 # Local-only extensions.
 agent/extensions/orca-*
+
+!agent/AGENTS.md
