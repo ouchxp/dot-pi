@@ -10,7 +10,7 @@
   "enableInstallTelemetry": false,
   "defaultProjectTrust": "always",
   "doubleEscapeAction": "tree",
-  "treeFilterMode": "default",
+  "treeFilterMode": "no-tools",
   "hideThinkingBlock": true,
   "packages": [
     "npm:pi-subagents",
