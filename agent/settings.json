@@ -24,7 +24,8 @@
     "npm:@dietrichgebert/ponytail",
     "npm:pi-tool-display",
     "npm:pi-zentui",
-    "https://github.com/ayghri/i-have-adhd"
+    "https://github.com/ayghri/i-have-adhd",
+    "npm:pi-effort"
   ],
   "subagents": {
     "agentOverrides": {
