@@ -12,6 +12,7 @@ import type {
 // 3rd-party OpenAI-compatible provider hosting a tiered model is covered
 // without registering under each provider id.
 const TIERED_MODEL_IDS = ["gpt-5.6-luna"];
+const EXCLUDED_PROVIDERS = new Set(["github-copilot"]);
 const SERVICE_TIER = "priority";
 const STATUS_KEY = "openai-service-tier";
 
@@ -20,7 +21,9 @@ function isPriorityModel(model: { id: string } | undefined): boolean {
 }
 
 export default function openaiServiceTier(pi: ExtensionAPI): void {
-  pi.on("before_provider_request", (event) => {
+  pi.on("before_provider_request", (event, ctx) => {
+    if (ctx.model && EXCLUDED_PROVIDERS.has(ctx.model.provider)) return;
+
     const payload = event.payload as { model?: string } | undefined;
     if (!payload || typeof payload.model !== "string") return;
     if (!isPriorityModel({ id: payload.model })) return;
@@ -30,7 +33,9 @@ export default function openaiServiceTier(pi: ExtensionAPI): void {
   const updateStatus = (ctx: ExtensionContext) => {
     ctx.ui.setStatus(
       STATUS_KEY,
-      ctx.model && isPriorityModel(ctx.model)
+      ctx.model &&
+        !EXCLUDED_PROVIDERS.has(ctx.model.provider) &&
+        isPriorityModel(ctx.model)
         ? `${ctx.model.id} ${SERVICE_TIER}`
         : undefined,
     );
