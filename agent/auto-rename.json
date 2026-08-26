@@ -1,0 +1,12 @@
+{
+    "prefixCommand": "basename \"$PWD\"",
+    "prompt": "Create a concise session title based on the request below. Use 3-8 words. If a ticket number such as ENG-14442 appears in the request, preserve it exactly as the first part of the title. Do not invent a ticket number. Return ONLY the title as plain text, with no Markdown or quotes.\n\nRequest:\n{{query}}",
+    "model": {
+        "provider": "openai-codex",
+        "id": "gpt-5.4-mini"
+    },
+    "fallbackModel": {
+        "provider": "deepseek",
+        "id": "deepseek-v4-flash"
+    }
+}

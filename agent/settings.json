@@ -1,8 +1,8 @@
 {
-  "lastChangelogVersion": "0.84.2",
+  "lastChangelogVersion": "0.84.3",
   "theme": "dark",
-  "defaultProvider": "github-copilot",
-  "defaultModel": "gpt-5.6-luna",
+  "defaultProvider": "fw",
+  "defaultModel": "accounts/fireworks/models/deepseek-v4-flash-0731",
   "defaultThinkingLevel": "max",
   "collapseChangelog": true,
   "quietStartup": true,
@@ -16,7 +16,6 @@
     "npm:pi-subagents",
     "npm:pi-lens",
     "npm:pi-mcp-adapter",
-    "npm:pi-continue",
     "npm:pi-web-access",
     "npm:@juicesharp/rpiv-todo",
     "npm:@narumitw/pi-btw",
@@ -25,9 +24,20 @@
     "npm:pi-tool-display",
     "npm:pi-zentui",
     "https://github.com/ayghri/i-have-adhd",
-    "npm:pi-effort"
+    "npm:pi-effort",
+    "npm:@byteowlz/pi-auto-rename"
   ],
   "subagents": {
+    "modelScope": {
+      "agents": {
+        "oracle": {
+          "enforce": true,
+          "allow": [
+            "quotio-gpt/gpt-5.6-sol"
+          ]
+        }
+      }
+    },
     "agentOverrides": {
       "scout": {
         "model": "quotio-gpt/gpt-5.6-terra",
@@ -64,8 +74,10 @@
           "read",
           "grep",
           "find",
-          "ls"
-        ]
+          "ls",
+          "bash"
+        ],
+        "timeoutMs": 7200000
       },
       "oracle": {
         "model": "quotio-gpt/gpt-5.6-sol",
@@ -74,8 +86,10 @@
           "read",
           "grep",
           "find",
-          "ls"
-        ]
+          "ls",
+          "bash"
+        ],
+        "timeoutMs": 7200000
       }
     },
     "watchdog": {

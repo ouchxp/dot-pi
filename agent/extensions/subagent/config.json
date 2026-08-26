@@ -1,5 +1,8 @@
 {
 	"control": {
 		"needsAttentionAfterMs": 600000
+	},
+	"modelExclusions": {
+		"defaultTtlMs": 60000
 	}
 }
