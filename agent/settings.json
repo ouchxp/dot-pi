@@ -25,7 +25,8 @@
     "npm:pi-zentui",
     "https://github.com/ayghri/i-have-adhd",
     "npm:pi-effort",
-    "npm:@byteowlz/pi-auto-rename"
+    "npm:@byteowlz/pi-auto-rename",
+    "npm:@ff-labs/pi-fff"
   ],
   "subagents": {
     "modelScope": {
@@ -46,7 +47,12 @@
           "read",
           "grep",
           "find",
-          "ls"
+          "ls",
+          "ffgrep",
+          "fffind",
+          "module_report",
+          "read_symbol",
+          "read_enclosing"
         ]
       },
       "delegate": {
@@ -75,7 +81,12 @@
           "grep",
           "find",
           "ls",
-          "bash"
+          "bash",
+          "ffgrep",
+          "fffind",
+          "module_report",
+          "read_symbol",
+          "read_enclosing"
         ],
         "timeoutMs": 7200000
       },
@@ -87,7 +98,12 @@
           "grep",
           "find",
           "ls",
-          "bash"
+          "bash",
+          "ffgrep",
+          "fffind",
+          "module_report",
+          "read_symbol",
+          "read_enclosing"
         ],
         "timeoutMs": 7200000
       }
@@ -102,5 +118,9 @@
     }
   },
   "tuiMode": "regular",
-  "transport": "auto"
+  "transport": "auto",
+  "forkContext": {
+    "mode": "pruned",
+    "model": "deepseek/deepseek-v4-flash:low"
+  }
 }
