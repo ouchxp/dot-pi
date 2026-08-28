@@ -1,0 +1,3 @@
+{
+  "ignore": ["cjs/**", "dist/**", "build/**", "gogo-web/**", "testData/**", "uploads/**"]
+}
