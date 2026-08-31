@@ -51,7 +51,22 @@ export interface PaneCommandOptions {
 export function buildPaneCommand(opts: PaneCommandOptions): string {
   const parts = [...opts.launcher.map(shq), "--fork", shq(opts.sessionFile)];
   if (opts.message) parts.push(shq(opts.message));
-  return parts.join(" ");
+  const shell = process.env.SHELL ?? "/bin/bash";
+  // Ghostty wraps the pane command in `exec -l <cmd>`, so a plain trailing `;`
+  // is unreachable (exec replaces the shell before it is parsed). Run the fork
+  // from a throwaway bash that falls through to an interactive login shell when
+  // pi exits, keeping the pane alive (Orca behavior). SIGINT is ignored here so
+  // Ctrl+C reaches pi but does not kill the holder before the fallthrough runs.
+  //
+  // Ghostty spawns pane processes with a scrubbed env (the `env =` config does
+  // not reach surface commands), so export a full PATH here - pi's bash tool
+  // otherwise sees only ~/.pi/agent/bin and coreutils (head, cut, tr) are missing.
+  const fullPath =
+    "/usr/bin:/bin:/usr/sbin:/sbin:/opt/homebrew/bin:/opt/homebrew/sbin" +
+    ":$HOME/.nodenv/shims:$HOME/.nodenv/bin:$HOME/.local/bin:$PATH";
+  // double quotes: $HOME / $PATH expand in the pane's bash; no user input lands here
+  const script = `trap '' INT; export PATH="${fullPath}"; ${parts.join(" ")}; exec -l ${shq(shell)}`;
+  return `${shq("/bin/bash")} -c ${shq(script)}`;
 }
 
 /** AppleScript string literal escaping (backslash and double quote). */
