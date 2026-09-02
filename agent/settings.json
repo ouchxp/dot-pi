@@ -2,7 +2,7 @@
   "lastChangelogVersion": "0.84.4",
   "theme": "dark",
   "defaultProvider": "command-code",
-  "defaultModel": "deepseek/deepseek-v4-flash-fast",
+  "defaultModel": "deepseek/deepseek-v4-flash",
   "defaultThinkingLevel": "max",
   "collapseChangelog": true,
   "quietStartup": true,

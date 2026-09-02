@@ -17,7 +17,7 @@ This repository contains the personal configuration and customizations used by t
   - `tps.ts` — reports token throughput and usage after an agent run.
   - `subagent/config.json` — subagent attention timeout tuning.
 - `agent/chains/` — reusable multi-agent workflows:
-  - `council-review.chain.json` — runs independent correctness, test, and scope reviews, then synthesizes them with an oracle.
+  - `council-review.js` — parallel correctness, test, and scope reviews (`retryAll`). Parent then launches oracle with the returned `synthesisTask`.
 
 ## Local-only state
 
