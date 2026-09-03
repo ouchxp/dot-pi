@@ -12,7 +12,10 @@ export default function askModeExtension(pi: ExtensionAPI): void {
 
   function updateStatus(ctx: ExtensionContext): void {
     if (!ctx.hasUI) return;
-    ctx.ui.setStatus("ask-mode", askModeEnabled ? "? ASK" : "● EDIT");
+    // 38;2;255;255;0m = TrueColor Pure Vibrant Yellow (#FFFF00), 38;2;0;255;100m = TrueColor Bright Green
+    const askText = "\x1b[1;38;2;255;255;0m? ASK\x1b[0m";
+    const editText = "\x1b[1;38;2;0;255;100m● EDIT\x1b[0m";
+    ctx.ui.setStatus("ask-mode", askModeEnabled ? askText : editText);
   }
 
   function applyActiveTools(): void {
