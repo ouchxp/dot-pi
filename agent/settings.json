@@ -12,6 +12,7 @@
   "doubleEscapeAction": "tree",
   "treeFilterMode": "no-tools",
   "hideThinkingBlock": true,
+  "editorPaddingX": 1,
   "packages": [
     "npm:pi-subagents",
     "npm:pi-lens",
