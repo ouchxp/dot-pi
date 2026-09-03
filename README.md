@@ -14,6 +14,7 @@ This repository contains the personal configuration and customizations used by t
 - `agent/settings.json` — Pi defaults, installed packages (including the i-have-adhd skill), model settings, UI preferences, and subagent overrides.
 - `agent/auto-rename.json` — model configuration used for automatic session titles.
 - `agent/extensions/` — tracked custom extensions:
+  - `ask-mode.ts` — adds an Ask mode (read-only consultation, default on) and an Edit mode with `Shift+Tab` toggle, `/ask` command, session state persistence, system prompt context injection, and write tool blocking.
   - `caveman-autoload.ts` — injects the caveman skill instructions into every turn (on by default at full level) and shows the current mode in the footer.
   - `cursor-acp.ts` — Cursor agent over ACP; models come from the local (ignored) `cursor-models.json`.
   - `enforce-permissions.ts` — adds a second enforcement layer for restricted commands and protected paths.
