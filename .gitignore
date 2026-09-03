@@ -10,6 +10,8 @@ agent/npm/
 agent/run-history.jsonl
 agent/sessions/
 web-search-cache/
+mcp-cache.json
+mcp-npx-cache.json
 
 # Local-only extensions.
 agent/extensions/orca-*
