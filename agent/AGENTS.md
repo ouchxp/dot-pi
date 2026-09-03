@@ -22,6 +22,7 @@ Use subagents dynamically when they materially improve the result. Do not delega
 - **oracle**: use for difficult, ambiguous, architectural, or high-impact decisions, especially when there are competing approaches or conflicting evidence.
 - **worker**: implement a well-understood, bounded task after necessary exploration/research is complete.
 - **reviewer**: independently review meaningful changes for correctness, edge cases, tests, regressions, and unnecessary complexity. Verify reviewer findings before acting on them.
+- **exception-detector**: scan a diff for judgment-boundary exceptions — unusual code a human reviewer would stop at (unexplained existence, deviation from codebase precedent, scope-boundary violations). Complements correctness review; launch alongside reviewer on high-risk changes, or when a previous review round felt "clean but uneasy".
 - **delegate**: use for independent bounded subtasks that do not clearly fit another specialist.
 
 Prefer parallel delegation when tasks are independent.

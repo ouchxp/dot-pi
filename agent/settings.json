@@ -41,8 +41,8 @@
     },
     "agentOverrides": {
       "scout": {
-        "model": "quotio-gpt/gpt-5.6-terra",
-        "thinking": "xhigh",
+        "model": "command-code/deepseek/deepseek-v4-flash",
+        "thinking": "max",
         "tools": [
           "read",
           "grep",

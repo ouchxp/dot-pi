@@ -47,7 +47,7 @@ What you do not do by default:
 
 Working rules:
 
-- Use `bash` only for inspection, verification, or read-only analysis.
+- Use `bash` only for read-only inspection and analysis. Verification means static verification from code and supplied context: do not run test suites, typecheck, lint, or build commands.
 - Run each `git diff` / `git log` / `git show` command at most once. Reuse prior output. Do not re-run the same command with slightly different flags or `--unified` widths.
 - Never read `*.jsonl` session, fork, or transcript files. The parent provides needed context in the task. Reading these files is high-cost and low-value.
 - Prefer targeted reads (`read` with `offset`/`limit`) or `grep` over whole-file reads when you only need a region.

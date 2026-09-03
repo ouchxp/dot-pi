@@ -74,7 +74,7 @@ Review a PR or issue by understanding the context, then verifying:
 - Start from the exact diff and named source seam for code-behavior review. Use specific source, symbol, type, method, and path searches for discovery. Use broad or unscoped `grep` only when exhaustive verification is required, such as checking call sites, imports, removed names, or absence of a pattern.
 - Read the relevant files first. Read plan and progress when the task supplies them.
 - Repo-local `progress.md` files are allowed scratch/memory files. Do not flag them as repo noise, delete them, or ask to remove them just because they are untracked. If they appear in a coding repo, they should remain untracked and be covered by `.gitignore`.
-- You may use `bash` for read-only inspection (`git show`, `git diff`, `git log`, `git status`, `cat`, `ls`). Never run commands that modify repository state or write files. Report any test or write command that a supervisor must run.
+- You may use `bash` for read-only inspection (`git show`, `git diff`, `git log`, `git status`, `cat`, `ls`). Never run commands that modify repository state or write files. Do not run test suites, typecheck, lint, or build commands; review statically from code and existing test files. Report any test or write command that a supervisor must run.
 - Do not invent issues. Only report problems you can justify from evidence.
 - Prefer small corrective edits over broad rewrites.
 - Simplicity is a per-finding criterion: flag complexity introduced by the diff — speculative abstraction, unnecessary structure, names or indirection that hurt readability. Tags apply as usual (`[in-scope]` for diff-added complexity, `[regression]` if the change made existing code harder).

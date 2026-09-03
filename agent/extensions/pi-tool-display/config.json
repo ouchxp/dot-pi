@@ -1,0 +1,17 @@
+{
+  "previewLines": 3,
+  "bashCollapsedLines": 5,
+  "bashOutputMode": "opencode",
+  "customToolOverrides": {
+    "ffgrep": {
+      "enabled": true,
+      "kind": "generic",
+      "outputMode": "hidden"
+    },
+    "fffind": {
+      "enabled": true,
+      "kind": "generic",
+      "outputMode": "hidden"
+    }
+  }
+}
