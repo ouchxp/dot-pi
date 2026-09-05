@@ -3,9 +3,9 @@ name: reviewer
 description: Versatile review specialist for code diffs, plans, proposed solutions, codebase health, and PR/issue validation
 tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_enclosing
 defaultContext: fresh
-model: quotio-gpt/gpt-5.6-sol
+model: quotio-gpt/gpt-6-astra
 timeoutMs: 7200000
-thinking: xhigh
+thinking: medium
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false

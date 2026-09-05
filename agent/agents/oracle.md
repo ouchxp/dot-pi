@@ -3,9 +3,9 @@ name: oracle
 aliases: advisor
 description: High-context decision-consistency oracle that protects inherited state and prevents drift
 tools: read, grep, find, ls, bash
-model: quotio-gpt/gpt-5.6-sol
+model: quotio-gpt/gpt-6-astra
 timeoutMs: 7200000
-thinking: max
+thinking: high
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false

@@ -20,7 +20,7 @@ resume-retry-guard extension injects its `retryAll` preamble (it only injects fo
      `twg bb prs activity <ID>`.
    - Local branch diff: read-only git (`git diff dev...<branch> --stat`,
      `git diff dev...<branch>`, `git log --oneline dev..<branch>`).
-   Never guess keys or IDs; resolve them with twg help when unsure.
+     Never guess keys or IDs; resolve them with twg help when unsure.
 
 2. **Read the chain file.** `~/.pi/agent/chains/council-review.js`. It contains a
    `const task = "the current change"` placeholder and a header comment explaining the
@@ -39,7 +39,7 @@ resume-retry-guard extension injects its `retryAll` preamble (it only injects fo
 
 5. **Launch step 2 (chairman).** When step 1 returns, launch the chairman as a separate
    single child (the one-batch-per-workflow engine limit makes this a separate launch):
-   `subagent({ agent: "oracle", model: "quotio-gpt/gpt-5.6-sol:max", task: result.synthesisTask })`.
+   `subagent({ agent: "oracle", model: "quotio-gpt/gpt-6-astra:high", task: result.synthesisTask })`.
    Tell the user step 1 finished, count completed/agreed/disputed reports, and that the
    chairman pass is running.
 
