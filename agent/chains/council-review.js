@@ -13,7 +13,7 @@
 const task = "the current change";
 
 const models = [
-  { name: "gemini", model: "tokenflux-gemini/gemini-3.7-flash-tiered:high" },
+  { name: "gemini", model: "tokenflux-gemini/gemini-3.8-flash-tiered:high" },
   { name: "grok", model: "tokenflux-grok/grok-4.6:xhigh" },
 ];
 
@@ -37,7 +37,7 @@ const aspects = [
     prompt:
       "Review " +
       task +
-      " for unnecessary complexity, scope drift, and maintainability risks. Do not edit files. Do not run test suites, typecheck, lint, or build commands; review statically from code."
+      " for unnecessary complexity, scope drift, and maintainability risks. Do not edit files. Do not run test suites, typecheck, lint, or build commands; review statically from code.",
   },
 ];
 
@@ -64,7 +64,9 @@ for (let i = 0; i < jobs.length; i++) {
 }
 
 const synthesisTask = [
-  "Act as the council chairman. Synthesize the independent reports below for " + task + ".",
+  "Act as the council chairman. Synthesize the independent reports below for " +
+    task +
+    ".",
   "Give: FINAL VERDICT (APPROVE / REQUEST_CHANGES / NEEDS_DISCUSSION), MANDATORY FIXES,",
   "RECOMMENDED IMPROVEMENTS, and CONFLICT RESOLUTION where reviewers disagreed.",
   "Be decisive. Do not edit files.",
@@ -72,9 +74,11 @@ const synthesisTask = [
 ];
 for (let i = 0; i < jobs.length; i++) {
   synthesisTask.push(jobs[i].label + ":");
-  synthesisTask.push(reviews[i].ok
-    ? reviews[i].output
-    : `[NO REPORT — review failed: ${reviews[i].error ?? "no output"}. Exclude this aspect from consensus.]`);
+  synthesisTask.push(
+    reviews[i].ok
+      ? reviews[i].output
+      : `[NO REPORT — review failed: ${reviews[i].error ?? "no output"}. Exclude this aspect from consensus.]`,
+  );
   synthesisTask.push("");
 }
 

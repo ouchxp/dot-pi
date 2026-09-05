@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.84.4",
+  "lastChangelogVersion": "0.85.1",
   "theme": "dark",
   "defaultProvider": "command-code",
   "defaultModel": "deepseek/deepseek-v4-flash",
@@ -56,11 +56,11 @@
         ]
       },
       "delegate": {
-        "model": "quotio-gpt/gpt-5.6-terra",
-        "thinking": "xhigh"
+        "model": "tokenflux-gemini/gemini-3.8-flash-tiered",
+        "thinking": "high"
       },
       "researcher": {
-        "model": "quotio-gpt/gpt-5.6-terra",
+        "model": "tokenflux-gemini/gemini-3.8-flash-tiered",
         "thinking": "high",
         "tools": [
           "read",
@@ -70,8 +70,8 @@
         ]
       },
       "worker": {
-        "model": "quotio-gpt/gpt-5.6-terra",
-        "thinking": "xhigh"
+        "model": "tokenflux-gemini/gemini-3.8-flash-tiered",
+        "thinking": "high"
       },
       "reviewer": {
         "model": "quotio-gpt/gpt-5.6-sol",
