@@ -64,7 +64,7 @@
         "thinking": "high"
       },
       "reviewer": {
-        "model": "quotio-gpt/gpt-5.6-astra",
+        "model": "quotio-gpt/gpt-6-astra",
         "thinking": "medium",
         "tools": [
           "read",
@@ -81,7 +81,7 @@
         "timeoutMs": 7200000
       },
       "oracle": {
-        "model": "quotio-gpt/gpt-5.6-astra",
+        "model": "quotio-gpt/gpt-6-astra",
         "thinking": "high",
         "tools": [
           "read",

@@ -42,6 +42,12 @@ const aspects = [
 ];
 
 const jobs = [];
+// Run-level deadline per reviewer: slowest successful past review took ~32 min
+// (grok-correctness), so 60 min fails stuck children without killing slow workers.
+// Per-tool-call cap: read-only git/diff commands finish in seconds; a hung bash
+// (e.g. grok-tests, SIGKILLed after 4.6h) fails fast and retryAll resumes the child.
+const REVIEWER_TIMEOUT_MS = 3600000;
+const REVIEWER_TOOL_TIMEOUT_MS = 300000;
 for (const m of models) {
   for (const a of aspects) {
     jobs.push({
@@ -50,6 +56,8 @@ for (const m of models) {
       label: a.key + " review (" + m.name + ")",
       model: m.model,
       task: a.prompt,
+      timeoutMs: REVIEWER_TIMEOUT_MS,
+      toolTimeoutMs: REVIEWER_TOOL_TIMEOUT_MS,
     });
   }
 }
