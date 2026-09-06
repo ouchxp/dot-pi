@@ -25,7 +25,7 @@
           "pathDisplay": "compact",
           "contextFormat": "percent",
           "contextGauge": false,
-          "showSessionName": true,
+          "showSessionName": false,
           "showTimer": true,
           "showCost": true,
           "showGit": true,
@@ -101,7 +101,7 @@
         "starship": {
           "format": "",
           "responsive": true,
-          "compactFormat": "$cwd$wrap(in $session_name)$wrap(on $git_branch) $git_status$wrap$context$wrap_sep$tokens",
+          "compactFormat": "$cwd$wrap(in $session_name)$wrap(on $git_branch) $git_status$wrap$context$wrap_sep$tokens$wrap$extensions",
           "compactMaxLines": 2,
           "separator": "pipe",
           "contextStyle": "text",

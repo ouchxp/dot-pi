@@ -9,9 +9,9 @@
  * - "stop caveman" / "normal mode"  -> disable (input interception)
  * - "caveman mode" / "talk like caveman" / "use caveman" -> enable
  *
- * State is per-session: every session starts ON at "full". Turning it off
+ * State is per-session: every session starts ON at "lite". Turning it off
  * applies to the current session only; /new, /resume, /fork, /reload all
- * reset to on/full.
+ * reset to on/lite.
  *
  * If the skill file (~/.agents/skills/caveman/SKILL.md) is missing, no
  * instructions are injected: a notify shows the install command and the
@@ -52,8 +52,8 @@ function loadSkill(): string | null {
 }
 
 export default function (pi: ExtensionAPI) {
-  // Per-session state: always starts ON at full.
-  let state: State = { enabled: true, level: "full" };
+  // Per-session state: always starts ON at lite.
+  let state: State = { enabled: true, level: "lite" };
   const skill = loadSkill();
 
   function refreshStatus(ctx: ExtensionContext) {
@@ -81,9 +81,9 @@ export default function (pi: ExtensionAPI) {
     );
   }
 
-  // Fresh session (startup, /new, /resume, /fork, /reload) -> back to on/full.
+  // Fresh session (startup, /new, /resume, /fork, /reload) -> back to on/lite.
   pi.on("session_start", async (_event, ctx) => {
-    state = { enabled: true, level: "full" };
+    state = { enabled: true, level: "lite" };
     refreshStatus(ctx);
     if (!skill) warnMissing(ctx);
   });

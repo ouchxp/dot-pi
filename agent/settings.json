@@ -11,7 +11,7 @@
   "defaultProjectTrust": "always",
   "doubleEscapeAction": "tree",
   "treeFilterMode": "no-tools",
-  "hideThinkingBlock": true,
+  "hideThinkingBlock": false,
   "editorPaddingX": 1,
   "packages": [
     "npm:pi-subagents",
