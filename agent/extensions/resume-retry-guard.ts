@@ -22,12 +22,12 @@ import { isToolCallEventType } from "@earendil-works/pi-coding-agent";
  * retries require separate workflowScript launches.
  */
 const ONE_BATCH_LIMIT_REASON =
-	"pi-subagents workflow engine supports only ONE retryRun/retryAll batch per workflowScript (a second helper-mediated resume is rejected as unawaited). Use a single retryAll batch with all children, or split sequential dependent retries into separate workflowScript launches. See ~/.agents/skills/resume-retry/SKILL.md.";
+   "pi-subagents workflow engine supports only ONE retryRun/retryAll batch per workflowScript (a second helper-mediated resume is rejected as unawaited). Use a single retryAll batch with all children, or split sequential dependent retries into separate workflowScript launches. See ~/.agents/skills/resume-retry/SKILL.md.";
 
 /** Count retryRun(/retryAll( launch sites (excluding the preamble itself). */
 function countHelperLaunchSites(script: string): number {
-	const matches = script.match(/\bretryRun\s*\(|\bretryAll\s*\(/g);
-	return matches ? matches.length : 0;
+   const matches = script.match(/\bretryRun\s*\(|\bretryAll\s*\(/g);
+   return matches ? matches.length : 0;
 }
 
 /**
@@ -62,20 +62,23 @@ function retryRun(key, params, resumeTask) {
   });
 }
 
-// Retry a parallel fanout: resume each failed child individually, keep successful results.
+// Collect recovery failures too, so one failed resume does not abort its siblings.
 function retryAll(items, resumeTask) {
   return runs.all(items).then(function (results) {
     var pending = [];
+    var indexes = [];
     for (var i = 0; i < results.length; i++) {
       var result = results[i];
-      if (result.ok || !result.runId) {
-        pending.push(Promise.resolve(result));
-        continue;
-      }
+      if (result.ok || !result.runId) continue;
       var item = items[i];
-      pending.push(runs.run(item.key + '__resume', { resume: result.runId, task: __rrResumeTask(item.agent, resumeTask) }));
+      indexes.push(i);
+      pending.push({ key: item.key + '__resume', resume: result.runId, task: __rrResumeTask(item.agent, resumeTask) });
     }
-    return Promise.all(pending);
+    if (pending.length === 0) return results;
+    return runs.all(pending).then(function (resumed) {
+      for (var j = 0; j < resumed.length; j++) results[indexes[j]] = resumed[j];
+      return results;
+    });
   });
 }
 // === end resume-retry preamble ===
@@ -83,37 +86,38 @@ function retryAll(items, resumeTask) {
 `;
 
 interface SubagentInput extends Record<string, unknown> {
-	workflowScript?: unknown;
-	retry?: unknown;
+   workflowScript?: unknown;
+   retry?: unknown;
 }
 
 export default function (pi: ExtensionAPI) {
-	pi.on("tool_call", (event) => {
-		// The subagent tool is extension-registered, so it arrives as a CustomToolCallEvent.
-		if (!isToolCallEventType<"subagent", SubagentInput>("subagent", event)) return;
+   pi.on("tool_call", (event) => {
+      // The subagent tool is extension-registered, so it arrives as a CustomToolCallEvent.
+      if (!isToolCallEventType<"subagent", SubagentInput>("subagent", event))
+         return;
 
-		const input = event.input as SubagentInput;
-		if (typeof input.workflowScript !== "string") return; // single-child / management action
-		if (input.retry === false) return; // explicit opt-out
+      const input = event.input as SubagentInput;
+      if (typeof input.workflowScript !== "string") return; // single-child / management action
+      if (input.retry === false) return; // explicit opt-out
 
-		const script: string = input.workflowScript;
+      const script: string = input.workflowScript;
 
-		// Enforce: no raw launches. The injected preamble itself uses runs.run/runs.all,
-		// but it is added AFTER this check, so any hit here is authored by the caller.
-		if (/runs\.(run|all)\s*\(/.test(script)) {
-			return {
-				block: true,
-				reason:
-					"workflowScript must use the retryRun()/retryAll() helpers (auto-injected by the resume-retry-guard extension) instead of raw runs.run()/runs.all(), so failed children resume from their persisted session. See ~/.agents/skills/resume-retry/SKILL.md. Pass retry: false on the subagent call to opt out.",
-			};
-		}
+      // Enforce: no raw launches. The injected preamble itself uses runs.run/runs.all,
+      // but it is added AFTER this check, so any hit here is authored by the caller.
+      if (/runs\.(run|all)\s*\(/.test(script)) {
+         return {
+            block: true,
+            reason:
+               "workflowScript must use the retryRun()/retryAll() helpers (auto-injected by the resume-retry-guard extension) instead of raw runs.run()/runs.all(), so failed children resume from their persisted session. See ~/.agents/skills/resume-retry/SKILL.md. Pass retry: false on the subagent call to opt out.",
+         };
+      }
 
-		// Enforce: at most ONE retryRun/retryAll batch per workflow (engine limitation).
-		if (countHelperLaunchSites(script) > 1) {
-			return { block: true, reason: ONE_BATCH_LIMIT_REASON };
-		}
+      // Enforce: at most ONE retryRun/retryAll batch per workflow (engine limitation).
+      if (countHelperLaunchSites(script) > 1) {
+         return { block: true, reason: ONE_BATCH_LIMIT_REASON };
+      }
 
-		// Inject the portable helper preamble.
-		input.workflowScript = PREAMBLE + script;
-	});
+      // Inject the portable helper preamble.
+      input.workflowScript = PREAMBLE + script;
+   });
 }
