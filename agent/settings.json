@@ -1,7 +1,7 @@
 {
   "lastChangelogVersion": "0.85.1",
   "theme": "dark",
-  "defaultProvider": "command-code",
+  "defaultProvider": "commandcode",
   "defaultModel": "meta/muse-spark-1.3-contributor",
   "defaultThinkingLevel": "max",
   "collapseChangelog": true,
@@ -11,7 +11,7 @@
   "defaultProjectTrust": "always",
   "doubleEscapeAction": "tree",
   "treeFilterMode": "no-tools",
-  "hideThinkingBlock": false,
+  "hideThinkingBlock": true,
   "editorPaddingX": 1,
   "packages": [
     "npm:pi-subagents",
@@ -31,7 +31,7 @@
   "subagents": {
     "agentOverrides": {
       "scout": {
-        "model": "command-code/deepseek/deepseek-v4-flash",
+        "model": "commandcode/deepseek/deepseek-v4-flash",
         "thinking": "max",
         "tools": [
           "read",

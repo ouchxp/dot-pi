@@ -86,6 +86,17 @@ export default function askModeExtension(pi: ExtensionAPI): void {
     updateStatus(ctx);
     persistState();
 
+    pi.sendMessage(
+      {
+        customType: "ask-mode-boundary",
+        content: askModeEnabled
+          ? "[MODE: ASK] Switched to ASK mode — read-only research. Do not attempt edits."
+          : "[MODE: EDIT] Switched to EDIT mode — edits allowed. Any prior assistant messages telling the user to press Shift+Tab are STALE; do NOT repeat them. Proceed directly with the requested edits.",
+        display: true,
+      },
+      { triggerTurn: false },
+    );
+
     if (ctx.hasUI) {
       ctx.ui.notify(
         askModeEnabled
@@ -124,11 +135,31 @@ export default function askModeExtension(pi: ExtensionAPI): void {
   pi.on("before_agent_start", (event) => {
     const modeInstruction = askModeEnabled
       ? '\n\n[ASK MODE: ACTIVE]\nYou are in Ask Mode: a read-only research and consultation mode. Your job is to investigate, analyze, trace, and explain — dig into the issue, find the root cause, and report findings and recommendations clearly. You MUST NOT attempt to edit or write files, and you MUST NOT prepare edit plans or ask the user to unlock editing unless they explicitly ask you to apply a change.\n\nENFORCEMENT: The edit/write tools stay visible but every call is blocked with an explicit reminder, and every bash command runs inside an OS-level read-only sandbox (sandbox-exec). File writes of ANY kind — shell redirection, python/node/perl file writes, tee, base64 — are denied by the kernel, not by policy. Do not attempt shell-based edits or writes; they fail with "Operation not permitted". Do not seek workarounds; blocked attempts are expected and simply tell you to continue in research mode. Stay read-only and productive with analysis. If the user explicitly asks for an actual change, tell them the mode must be switched to EDIT (Shift+Tab) first.'
-      : "\n\n[EDIT MODE: ACTIVE]\nYou are in Edit Mode. File edits and code modifications are allowed.";
+      : "\n\n[EDIT MODE: ACTIVE]\nYou are in Edit Mode. File edits and code modifications are allowed. Any prior assistant messages telling the user to press Shift+Tab to switch to EDIT are STALE — the switch already happened. Do NOT mention Shift+Tab, Ask Mode, or read-only restrictions. Proceed directly with the user's requested edits using edit/write tools.";
 
     return {
       systemPrompt: event.systemPrompt + modeInstruction,
     };
+  });
+
+  // Keep only the newest mode-boundary message in LLM context so repeated
+  // toggles do not accumulate stale mode lines. History on disk untouched.
+  pi.on("context", (event) => {
+    const messages = event.messages as Array<{ customType?: string }>;
+    let lastIdx = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i]?.customType === "ask-mode-boundary") {
+        lastIdx = i;
+        break;
+      }
+    }
+    if (lastIdx === -1) return;
+    const filtered = event.messages.filter((m, idx) => {
+      const msg = m as { customType?: string };
+      return msg.customType !== "ask-mode-boundary" || idx === lastIdx;
+    });
+    if (filtered.length === event.messages.length) return;
+    return { messages: filtered };
   });
 
   // Extra safety guard: block edit/write tool calls if invoked in Ask Mode,

@@ -14,7 +14,7 @@ const task = "the current change";
 
 const models = [
   { name: "gemini", model: "tokenflux-gemini/gemini-3.8-flash-tiered:high" },
-  { name: "meta", model: "command-code/meta/muse-spark-1.3-contributor:xhigh" },
+  { name: "meta", model: "commandcode/meta/muse-spark-1.3-contributor:xhigh" },
 ];
 
 const aspects = [
