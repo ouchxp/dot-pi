@@ -31,7 +31,7 @@
   "subagents": {
     "agentOverrides": {
       "scout": {
-        "model": "commandcode/deepseek/deepseek-v4-flash",
+        "model": "commandcode/deepseek/deepseek-v4.1-flash",
         "thinking": "max",
         "tools": [
           "read",
@@ -111,6 +111,6 @@
   "transport": "auto",
   "forkContext": {
     "mode": "pruned",
-    "model": "deepseek/deepseek-v4-flash:low"
+    "model": "deepseek/deepseek-v4.1-flash:low"
   }
 }
