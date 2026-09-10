@@ -2,7 +2,7 @@
   "lastChangelogVersion": "0.85.1",
   "theme": "dark",
   "defaultProvider": "commandcode",
-  "defaultModel": "meta/muse-spark-1.3-contributor",
+  "defaultModel": "deepseek/deepseek-v4.1-flash",
   "defaultThinkingLevel": "max",
   "collapseChangelog": true,
   "quietStartup": true,
