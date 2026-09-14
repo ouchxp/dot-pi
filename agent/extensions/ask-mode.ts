@@ -3,8 +3,68 @@ import type {
   ExtensionContext,
   ToolCallEvent,
 } from "@earendil-works/pi-coding-agent";
+import fs from "node:fs";
+import path from "node:path";
 
 const EDIT_TOOLS = new Set<string>(["edit", "write", "ast_grep_replace"]);
+
+// Agents that may write. Every other subagent child starts read-only, which is
+// the safe direction: a writer agent has to be added here deliberately. The
+// aliases mirror the worker agent's declared aliases; the -writer suffix covers
+// the external CLI writer agents. To restrict Ask Mode to named read-only
+// agents instead, invert this check to an allowlist of those names.
+const WRITE_CAPABLE_AGENTS = new Set<string>([
+  "worker",
+  "delegate",
+  "developer",
+  "coder",
+  "implementer",
+  "develop",
+]);
+
+function isWriteCapableAgent(name: string): boolean {
+  const normalized = name.trim().toLowerCase();
+  return WRITE_CAPABLE_AGENTS.has(normalized) || normalized.endsWith("-writer");
+}
+
+/**
+ * Which agents this process is running. A child session gets no agent env var
+ * and, when spawned fresh, no session entries naming it, so the identity comes
+ * from the launch the subagent runner writes for its own run: the runner passes
+ * its config path in argv, that path names the run, and the run's status.json
+ * records every step's agent. Undefined means "not a subagent child, or the
+ * launch could not be read", which keeps the read-only default.
+ */
+function launchedAgents(): string[] | undefined {
+  if (process.env.PI_SUBAGENT_CHILD !== "1") return undefined;
+
+  const cfgPath = process.argv.find((arg) => /(^|\/)async-cfg-[^/]+\.json$/.test(arg));
+  if (!cfgPath) return undefined;
+  const runId = path.basename(cfgPath).replace(/^async-cfg-/, "").replace(/\.json$/, "");
+
+  // status.json is written before the child session starts; the config itself is
+  // a fallback for the moment before that, and is deleted once the run is up.
+  const candidates = [
+    path.join(path.dirname(cfgPath), "async-subagent-runs", runId, "status.json"),
+    cfgPath,
+  ];
+
+  for (const candidate of candidates) {
+    try {
+      const raw = JSON.parse(fs.readFileSync(candidate, "utf-8")) as {
+        agent?: unknown;
+        steps?: Array<{ agent?: unknown }>;
+      };
+      const names = [raw.agent, ...(raw.steps ?? []).map((step) => step?.agent)].filter(
+        (name): name is string => typeof name === "string" && name.length > 0,
+      );
+      if (names.length > 0) return names;
+    } catch {
+      // Try the next candidate; an unreadable launch keeps the read-only default.
+    }
+  }
+  return undefined;
+}
 
 // Read-only OS sandbox profile (SBPL) applied to every bash command in Ask Mode.
 // Denies all file-write syscalls at the kernel; allows only temp dirs, /dev/null
@@ -50,6 +110,32 @@ function isWriteDenial(text: string): boolean {
 export default function askModeExtension(pi: ExtensionAPI): void {
   let askModeEnabled = true;
   let toolsBeforeAskMode: string[] | undefined;
+  // True once the mode comes from a persisted toggle instead of the default, so
+  // an explicit choice is never overridden by the agent-based default below.
+  let modeExplicit = false;
+  let childWriteAccess: boolean | undefined;
+
+  /**
+   * A launch runs its child with every one of its agents, and the mode is
+   * session-wide, so a mixed chain stays read-only. Resolved once, then reused.
+   */
+  function resolveChildWriteAccess(): boolean | undefined {
+    if (childWriteAccess === undefined) {
+      const agents = launchedAgents();
+      if (agents) childWriteAccess = agents.every(isWriteCapableAgent);
+    }
+    return childWriteAccess;
+  }
+
+  // Subagent sessions start in Ask Mode by default, except when the agent they
+  // run is allowed to write. Called on session start and again on each agent
+  // start, because the launch status may not be on disk yet at session start.
+  function applyChildModeDefault(): void {
+    if (modeExplicit) return;
+    const writeAccess = resolveChildWriteAccess();
+    if (writeAccess === undefined) return;
+    askModeEnabled = !writeAccess;
+  }
 
   function updateStatus(ctx: ExtensionContext): void {
     if (!ctx.hasUI) return;
@@ -82,6 +168,7 @@ export default function askModeExtension(pi: ExtensionAPI): void {
     if (nextState === askModeEnabled) return;
 
     askModeEnabled = nextState;
+    modeExplicit = true;
     applyActiveTools();
     updateStatus(ctx);
     persistState();
@@ -122,17 +209,22 @@ export default function askModeExtension(pi: ExtensionAPI): void {
     if (lastEntry?.data?.enabled === undefined) {
       askModeEnabled = true;
       toolsBeforeAskMode = undefined;
+      modeExplicit = false;
     } else {
       askModeEnabled = lastEntry.data.enabled;
       toolsBeforeAskMode = lastEntry.data.toolsBeforeAskMode;
+      modeExplicit = true;
     }
 
+    applyChildModeDefault();
     applyActiveTools();
     updateStatus(ctx);
   });
 
   // Inject mode state into system prompt per turn
   pi.on("before_agent_start", (event) => {
+    applyChildModeDefault();
+
     const modeInstruction = askModeEnabled
       ? '\n\n[ASK MODE: ACTIVE]\nYou are in Ask Mode: a read-only research and consultation mode. Your job is to investigate, analyze, trace, and explain — dig into the issue, find the root cause, and report findings and recommendations clearly. You MUST NOT attempt to edit or write files, and you MUST NOT prepare edit plans or ask the user to unlock editing unless they explicitly ask you to apply a change.\n\nENFORCEMENT: The edit/write tools stay visible but every call is blocked with an explicit reminder, and every bash command runs inside an OS-level read-only sandbox (sandbox-exec). File writes of ANY kind — shell redirection, python/node/perl file writes, tee, base64 — are denied by the kernel, not by policy. Do not attempt shell-based edits or writes; they fail with "Operation not permitted". Do not seek workarounds; blocked attempts are expected and simply tell you to continue in research mode. Stay read-only and productive with analysis. If the user explicitly asks for an actual change, tell them the mode must be switched to EDIT (Shift+Tab) first.'
       : "\n\n[EDIT MODE: ACTIVE]\nYou are in Edit Mode. File edits and code modifications are allowed. Any prior assistant messages telling the user to press Shift+Tab to switch to EDIT are STALE — the switch already happened. Do NOT mention Shift+Tab, Ask Mode, or read-only restrictions. Proceed directly with the user's requested edits using edit/write tools.";

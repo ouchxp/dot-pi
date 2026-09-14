@@ -14,7 +14,7 @@
   "hideThinkingBlock": true,
   "editorPaddingX": 1,
   "packages": [
-    "npm:pi-subagents",
+    "npm:pi-subagents@0.66.0",
     "npm:pi-lens",
     "npm:pi-mcp-adapter",
     "npm:pi-web-access",
@@ -32,18 +32,7 @@
     "agentOverrides": {
       "scout": {
         "model": "commandcode/deepseek/deepseek-v4.1-flash",
-        "thinking": "max",
-        "tools": [
-          "read",
-          "grep",
-          "find",
-          "ls",
-          "ffgrep",
-          "fffind",
-          "module_report",
-          "read_symbol",
-          "read_enclosing"
-        ]
+        "thinking": "max"
       },
       "delegate": {
         "model": "tokenflux-gemini/gemini-3.8-flash-tiered",
@@ -51,50 +40,20 @@
       },
       "researcher": {
         "model": "tokenflux-gemini/gemini-3.8-flash-tiered",
-        "thinking": "high",
-        "tools": [
-          "read",
-          "web_search",
-          "fetch_content",
-          "get_search_content"
-        ]
+        "thinking": "high"
       },
       "worker": {
-        "model": "tokenflux-gemini/gemini-3.8-flash-tiered",
-        "thinking": "high"
+        "model": "commandcode/deepseek/deepseek-v4.1-flash",
+        "thinking": "max"
       },
       "reviewer": {
         "model": "quotio-gpt/gpt-6-astra",
         "thinking": "medium",
-        "tools": [
-          "read",
-          "grep",
-          "find",
-          "ls",
-          "bash",
-          "ffgrep",
-          "fffind",
-          "module_report",
-          "read_symbol",
-          "read_enclosing"
-        ],
         "timeoutMs": 7200000
       },
       "oracle": {
         "model": "quotio-gpt/gpt-6-astra",
         "thinking": "high",
-        "tools": [
-          "read",
-          "grep",
-          "find",
-          "ls",
-          "bash",
-          "ffgrep",
-          "fffind",
-          "module_report",
-          "read_symbol",
-          "read_enclosing"
-        ],
         "timeoutMs": 7200000
       }
     },
