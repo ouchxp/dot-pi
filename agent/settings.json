@@ -47,12 +47,12 @@
         "thinking": "max"
       },
       "reviewer": {
-        "model": "quotio-gpt/gpt-6-astra",
+        "model": "openai-codex/gpt-6-astra",
         "thinking": "medium",
         "timeoutMs": 7200000
       },
       "oracle": {
-        "model": "quotio-gpt/gpt-6-astra",
+        "model": "openai-codex/gpt-6-astra",
         "thinking": "high",
         "timeoutMs": 7200000
       }
@@ -61,7 +61,7 @@
       "enabled": false,
       "main": {
         "enabled": false,
-        "model": "quotio-gpt/gpt-5.6-sol",
+        "model": "openai-codex/gpt-5.6-sol",
         "thinking": "xhigh"
       }
     }

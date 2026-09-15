@@ -3,7 +3,7 @@ name: exception-detector
 description: Judgment-boundary scanner that flags unusual code a human reviewer would challenge, distinct from correctness review
 tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_enclosing, bash
 defaultContext: fresh
-model: quotio-gpt/gpt-6-astra
+model: openai-codex/gpt-6-astra
 timeoutMs: 7200000
 thinking: medium
 systemPromptMode: replace

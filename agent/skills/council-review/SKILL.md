@@ -39,7 +39,7 @@ resume-retry-guard extension injects its `retryAll` preamble (it only injects fo
 
 5. **Launch step 2 (chairman).** When step 1 returns, launch the chairman as a separate
    single child (the one-batch-per-workflow engine limit makes this a separate launch):
-   `subagent({ agent: "oracle", model: "quotio-gpt/gpt-6-astra:high", task: result.synthesisTask })`.
+   `subagent({ agent: "oracle", model: "openai-codex/gpt-6-astra:high", task: result.synthesisTask })`.
    Tell the user step 1 finished, count completed/agreed/disputed reports, and that the
    chairman pass is running.
 

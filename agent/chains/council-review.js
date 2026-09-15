@@ -4,7 +4,7 @@
 // Edit `task` before launch. Stage 1 runs two reviewer models, each covering all three
 // review aspects (correctness, tests, scope), in parallel. No gpt model is used in this step.
 // After this returns, the parent automatically launches the gpt chairman as a single child:
-//   subagent({ agent: "oracle", model: "quotio-gpt/gpt-6-astra:high", task: result.synthesisTask })
+//   subagent({ agent: "oracle", model: "openai-codex/gpt-6-astra:high", task: result.synthesisTask })
 // gpt runs ONLY the synthesis step. It is a separate launch because this environment
 // allows only one retryAll/retryRun per script (resume-retry-guard engine limitation);
 // the parent chains the two steps: run this workflow, then launch the chairman with the

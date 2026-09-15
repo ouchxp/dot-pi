@@ -12,6 +12,7 @@ agent/sessions/
 web-search-cache/
 mcp-cache.json
 mcp-npx-cache.json
+council-review-v2-model-stats.jsonl
 
 # Local-only extensions.
 agent/extensions/orca-*

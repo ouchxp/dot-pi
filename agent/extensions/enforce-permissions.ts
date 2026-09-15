@@ -37,10 +37,10 @@
  *   "git". Read-only commands whose later args contain op-named paths/refs
  *   ("git show am.ts", "git log --grep='I am here'") never match, because the
  *   op cannot be reached past the read-only subcommand.
- * - The word boundary after the op blocks hyphenated plumbing variants
- *   ("git commit-tree", "git checkout-index", "git merge-base") and any
- *   op-prefixed lookalike ("git pull-request" — not a real git command) — the
- *   safe direction for a deny list. Known limitation: quoted or unusual shell
+ * - The (?![-\w]) guard after the op blocks op-prefixed lookalikes
+ *   ("git amazing", "git pull-request") and keeps hyphenated plumbing
+ *   ("git commit-tree", "git checkout-index", "git merge-base" — real
+ *   read-only commands) allowed. Known limitation: quoted or unusual shell
  *   tokenization is modeled only for simple '...'/"..." values; a mutation
  *   hidden behind exotic quoting may not match here (the permissions file
  *   remains the primary gate).
@@ -52,23 +52,23 @@ import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { isToolCallEventType } from "@earendil-works/pi-coding-agent";
 
 type BashDenyRule = {
-  pattern: RegExp;
-  label: (match: RegExpExecArray) => string;
+ pattern: RegExp;
+ label: (match: RegExpExecArray) => string;
 };
 
 const BASH_DENY_RULES: BashDenyRule[] = [
-  {
-    pattern:
-      /(^|[;&|()\s])\s*git((?:\s+(?:-C|--git-dir|--work-tree|--namespace|-c|--exec-path)\s+(?:[^\s|;&\\'"]+|'[^']*'|"[^"]*")+|\s+--[^\s|;&\\]+|\s+-[^\s|;&\\]+)*)\s+(?<op>add|commit|push|pull|checkout|restore|reset|clean|stash(?!\s+(?:list|show)(?![-\w]))|rebase|merge|cherry-pick|revert|apply|am)\b/i,
-    label: (match) => `git ${match.groups?.op ?? "mutation"}`,
-  },
-  {
-    pattern: /(^|[;&|()\s])\s*git(\s+[^\s|;&\\]*)*\s+branch\s+-[dD]\b/,
-    label: () => "git branch -d/-D",
-  },
-  { pattern: /(^|[;&|()\s])\s*rm(\s+|$)/, label: () => "rm" },
-  { pattern: /(^|[;&|()\s])\s*rmdir(\s+|$)/, label: () => "rmdir" },
-  { pattern: /(^|[;&|()\s])\s*trash(\s+|$)/, label: () => "trash" },
+ {
+  pattern:
+   /(^|[;&|()\s])\s*git((?:\s+(?:-C|--git-dir|--work-tree|--namespace|-c|--exec-path)\s+(?:[^\s|;&\\'"]+|'[^']*'|"[^"]*")+|\s+--[^\s|;&\\]+|\s+-[^\s|;&\\]+)*)\s+(?<op>add|commit|push|pull|checkout|restore|reset|clean|stash(?!\s+(?:list|show)(?![-\w]))|rebase|merge|cherry-pick|revert|apply|am)(?![-\w])/i,
+  label: (match) => `git ${match.groups?.op ?? "mutation"}`,
+ },
+ {
+  pattern: /(^|[;&|()\s])\s*git(\s+[^\s|;&\\]*)*\s+branch\s+-[dD]\b/,
+  label: () => "git branch -d/-D",
+ },
+ { pattern: /(^|[;&|()\s])\s*rm(\s+|$)/, label: () => "rm" },
+ { pattern: /(^|[;&|()\s])\s*rmdir(\s+|$)/, label: () => "rmdir" },
+ { pattern: /(^|[;&|()\s])\s*trash(\s+|$)/, label: () => "trash" },
 ];
 
 // write/edit deny rule from the permissions file:
@@ -76,43 +76,43 @@ const BASH_DENY_RULES: BashDenyRule[] = [
 const PROTECTED_PREFIX = "/Users/nanw/.pi/agent/npm/node_modules/pi-subagents";
 
 function isProtectedPath(path: string): boolean {
-  const normalized = path.replace(/\/+$/, "");
-  return (
-    normalized === PROTECTED_PREFIX ||
-    normalized.startsWith(`${PROTECTED_PREFIX}/`)
-  );
+ const normalized = path.replace(/\/+$/, "");
+ return (
+  normalized === PROTECTED_PREFIX ||
+  normalized.startsWith(`${PROTECTED_PREFIX}/`)
+ );
 }
 
 export default function (pi: ExtensionAPI) {
-  pi.on("tool_call", (event) => {
-    if (isToolCallEventType("bash", event)) {
-      const command = event.input.command;
-      for (const { pattern, label } of BASH_DENY_RULES) {
-        const match = pattern.exec(command);
-        if (match) {
-          return {
-            block: true,
-            reason: `Blocked by enforce-permissions extension (deny rule "${label(match)}"): ${command}`,
-          };
-        }
-      }
-      return undefined;
+ pi.on("tool_call", (event) => {
+  if (isToolCallEventType("bash", event)) {
+   const command = event.input.command;
+   for (const { pattern, label } of BASH_DENY_RULES) {
+    const match = pattern.exec(command);
+    if (match) {
+     return {
+      block: true,
+      reason: `Blocked by enforce-permissions extension (deny rule "${label(match)}"): ${command}`,
+     };
     }
+   }
+   return undefined;
+  }
 
-    if (
-      isToolCallEventType("write", event) ||
-      isToolCallEventType("edit", event)
-    ) {
-      const path = event.input.path;
-      if (isProtectedPath(path)) {
-        return {
-          block: true,
-          reason: `Blocked by enforce-permissions extension (protected path): ${path}`,
-        };
-      }
-      return undefined;
-    }
+  if (
+   isToolCallEventType("write", event) ||
+   isToolCallEventType("edit", event)
+  ) {
+   const path = event.input.path;
+   if (isProtectedPath(path)) {
+    return {
+     block: true,
+     reason: `Blocked by enforce-permissions extension (protected path): ${path}`,
+    };
+   }
+   return undefined;
+  }
 
-    return undefined;
-  });
+  return undefined;
+ });
 }
