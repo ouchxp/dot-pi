@@ -5,7 +5,7 @@ tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_en
 defaultContext: fresh
 model: openai-codex/gpt-6-astra
 timeoutMs: 7200000
-thinking: medium
+thinking: high
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false

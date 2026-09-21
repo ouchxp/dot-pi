@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.85.1",
+  "lastChangelogVersion": "0.87.0",
   "theme": "dark",
   "defaultProvider": "commandcode",
   "defaultModel": "deepseek/deepseek-v4.1-flash",
@@ -35,12 +35,12 @@
         "thinking": "max"
       },
       "delegate": {
-        "model": "tokenflux-gemini/gemini-3.8-flash-tiered",
-        "thinking": "high"
+        "model": "commandcode/meta/muse-spark-1.3-contributor",
+        "thinking": "max"
       },
       "researcher": {
-        "model": "tokenflux-gemini/gemini-3.8-flash-tiered",
-        "thinking": "high"
+        "model": "commandcode/meta/muse-spark-1.3-contributor",
+        "thinking": "max"
       },
       "worker": {
         "model": "commandcode/deepseek/deepseek-v4.1-flash",
@@ -48,12 +48,12 @@
       },
       "reviewer": {
         "model": "openai-codex/gpt-6-astra",
-        "thinking": "medium",
+        "thinking": "high",
         "timeoutMs": 7200000
       },
       "oracle": {
         "model": "openai-codex/gpt-6-astra",
-        "thinking": "high",
+        "thinking": "xhigh",
         "timeoutMs": 7200000
       }
     },
@@ -70,6 +70,6 @@
   "transport": "auto",
   "forkContext": {
     "mode": "pruned",
-    "model": "deepseek/deepseek-v4.1-flash:low"
+    "model": "commandcode/deepseek/deepseek-v4.1-flash:low"
   }
 }

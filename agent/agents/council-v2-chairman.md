@@ -3,7 +3,7 @@ name: council-v2-chairman
 description: Decisive synthesis chairman for council-review-v2 (verdict from verified findings only)
 tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_enclosing
 defaultContext: fresh
-model: commandcode/meta/muse-spark-1.3-contributor
+model: openai-codex/gpt-6-astra
 fallbackModels: commandcode/deepseek/deepseek-v4.1-flash
 timeoutMs: 7200000
 thinking: high

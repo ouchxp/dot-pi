@@ -4,6 +4,7 @@ import type {
   ToolCallEvent,
 } from "@earendil-works/pi-coding-agent";
 import fs from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 const EDIT_TOOLS = new Set<string>(["edit", "write", "ast_grep_replace"]);
@@ -72,11 +73,17 @@ function launchedAgents(): string[] | undefined {
 // This is the enforcement layer: no interpreter (python/node/tee/printf/base64)
 // can bypass a kernel deny, so Ask Mode's read-only guarantee does not depend on
 // the model respecting the system prompt or on deny-list pattern coverage.
+// ~/.mycli.log and ~/.mycli_history are the two explicit file exceptions:
+// mycli appends its own log and history there and is otherwise a read-only client.
+const MYCLI_WRITE_PATHS = [".mycli.log", ".mycli_history"].map((name) =>
+  path.join(os.homedir(), name),
+);
 const ASK_MODE_SANDBOX_PROFILE =
   "(version 1)" +
   "(allow default)" +
   "(deny file-write*)" +
-  '(allow file-write* (subpath "/private/tmp") (subpath "/private/var/folders") (literal "/dev/null") (subpath "/dev/fd"))';
+  '(allow file-write* (subpath "/private/tmp") (subpath "/private/var/folders") (literal "/dev/null") (subpath "/dev/fd") ' +
+  `${MYCLI_WRITE_PATHS.map((p) => `(literal ${JSON.stringify(p)})`).join(" ")})`;
 
 function sandboxShellQuote(command: string): string {
   // Wrap for single-quoted /bin/bash -c argument inside the sandbox-exec arg;

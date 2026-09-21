@@ -10,7 +10,7 @@ Three stages, cheap models throughout. Findings ledger is mandatory and survives
 ## Files (do not rename v1)
 
 - Chain: `~/.pi/agent/chains/council-review-v2-stage1.js`, `~/.pi/agent/chains/council-review-v2-stage2.js`
-- Agents: `council-v2-reviewer`, `council-v2-verifier`, `council-v2-chairman` (primary `commandcode/deepseek/deepseek-v4.1-flash`, fallback `commandcode/meta/muse-spark-1.3-contributor` in frontmatter)
+- Agents: `council-v2-reviewer`, `council-v2-verifier`, `council-v2-chairman` (chairman primary `openai-codex/gpt-6-astra` at `thinking: high`, fallback `commandcode/deepseek/deepseek-v4.1-flash` in frontmatter)
 - Ledger: `~/Projects/ai-docs/reviews/<repo>/<slug>.jsonl` plus memo `<slug>.md` beside it
 
 ## 1. Resolve scope and ledger

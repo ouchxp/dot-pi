@@ -5,7 +5,7 @@ description: High-context decision-consistency oracle that protects inherited st
 tools: read, grep, find, ls, bash
 model: openai-codex/gpt-6-astra
 timeoutMs: 7200000
-thinking: high
+thinking: xhigh
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
