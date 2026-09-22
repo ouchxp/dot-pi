@@ -17,16 +17,13 @@ const ledgerSummary = "";
 const PRIOR = "";
 const ROUND = 1;
 const MODELS = {
-  edge: [
-    "commandcode/meta/muse-spark-1.3-contributor",
-    "commandcode/deepseek/deepseek-v4.1-flash",
-  ],
+  edge: ["openai-codex/gpt-6-luna", "commandcode/deepseek/deepseek-v4.1-flash"],
   callers: [
-    "commandcode/meta/muse-spark-1.3-contributor",
+    "openai-codex/gpt-6-luna",
     "commandcode/deepseek/deepseek-v4.1-flash",
   ],
   simplify: [
-    "commandcode/meta/muse-spark-1.3-contributor",
+    "openai-codex/gpt-6-luna",
     "commandcode/deepseek/deepseek-v4.1-flash",
   ],
 };

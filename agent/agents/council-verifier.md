@@ -3,10 +3,10 @@ name: council-verifier
 description: Independent finding verifier for council-review (UPHELD/REFUTED/INCONCLUSIVE with evidence)
 tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_enclosing
 defaultContext: fresh
-model: commandcode/meta/muse-spark-1.3-contributor
+model: openai-codex/gpt-6-luna
 fallbackModels: commandcode/deepseek/deepseek-v4.1-flash
 timeoutMs: 7200000
-thinking: high
+thinking: max
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false

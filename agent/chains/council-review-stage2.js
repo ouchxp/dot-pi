@@ -16,7 +16,7 @@
 // then appends finding_verified + chairman_decision events to the ledger.
 
 const stage2Payload = "__STAGE1_OUTPUT__";
-const VERIFIER_MODEL = "commandcode/meta/muse-spark-1.3-contributor";
+const VERIFIER_MODEL = "openai-codex/gpt-6-luna";
 
 let payload;
 try {
@@ -84,7 +84,15 @@ for (let i = 0; i < unique.length; i++) {
   jobs.push({
     key: "verify-" + (i + 1),
     agent: "council-verifier",
-    label: "verify finding " + (i + 1) + "/" + unique.length + ": " + (f.file || "") + " " + (f.lines || ""),
+    label:
+      "verify finding " +
+      (i + 1) +
+      "/" +
+      unique.length +
+      ": " +
+      (f.file || "") +
+      " " +
+      (f.lines || ""),
     model: VERIFIER_MODEL,
     task:
       "Change scope: " +
@@ -233,7 +241,9 @@ lines.push(
   "Give: FINAL VERDICT (APPROVE / REQUEST_CHANGES / NEEDS_DISCUSSION),",
 );
 lines.push("MANDATORY FIXES (P1 only, with file, lines, smallest fix),");
-lines.push("RECOMMENDED IMPROVEMENTS (P2), and LOW NOTES (P3, cap 5, non-blocking).");
+lines.push(
+  "RECOMMENDED IMPROVEMENTS (P2), and LOW NOTES (P3, cap 5, non-blocking).",
+);
 lines.push(
   "Marking rule: reproduce each issue's two tags verbatim in every section, in the form `[Pn] [<tag>] file lines — claim` (e.g. `[P2] [in-scope] gogo/models/Ride.ts 6799-6812 — ...`). Never show issue codes; this task has none. Never drop the classification tag; the parent quotes these lines directly into chat and into the memo.",
 );

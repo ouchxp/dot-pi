@@ -4,9 +4,9 @@ description: Structured-findings code reviewer for council-review (cheap primary
 tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_enclosing
 defaultContext: fresh
 model: commandcode/deepseek/deepseek-v4.1-flash
-fallbackModels: commandcode/meta/muse-spark-1.3-contributor
+fallbackModels: openai-codex/gpt-6-luna
 timeoutMs: 7200000
-thinking: high
+thinking: max
 systemPromptMode: replace
 inheritProjectContext: true
 inheritSkills: false
