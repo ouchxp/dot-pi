@@ -11,7 +11,7 @@ import type {
 // streamSimple wrapper: the hook fires for every provider request, so any
 // 3rd-party OpenAI-compatible provider hosting a tiered model is covered
 // without registering under each provider id.
-const TIERED_MODEL_IDS = ["gpt-5.6-luna"];
+const TIERED_MODEL_IDS = ["gpt-6-luna"];
 const EXCLUDED_PROVIDERS = new Set(["github-copilot"]);
 const SERVICE_TIER = "priority";
 const STATUS_KEY = "openai-service-tier";

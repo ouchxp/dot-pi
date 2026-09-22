@@ -1,15 +1,18 @@
-// Council review v2, stage 2 of 3: dedupe + independent verification.
+// Council review, stage 2 of 3: dedupe + independent verification.
+// Merges repeats so each issue is checked once. Rejected and unsure verdicts
+// stay in the ledger only; the chairman only sees confirmed (UPHELD) issues.
+// No issue codes are shown to the reader; ids live in JSON only.
 // Invoke as workflowScript (not workflowScriptPath) so resume-retry-guard injects retryAll:
 //   subagent({ workflowScript: <this file>, async: true })
 // Before launch, the parent replaces `stage2Payload` with stage 1's
 // result.stage2Payload string (exact replacement of the placeholder line).
 // `VERIFIER_MODEL` is the single customization point for the verifier model;
 // the chairman model is chosen at its single-child launch; fallbacks live in the
-// council-v2-verifier / council-v2-chairman agent frontmatter.
+// council-verifier / council-chairman agent frontmatter.
 // Convergence counts P1/P2 signal only: P3 findings are still verified for the
 // memo low notes, but never enter the convergence tuple or the converged decision.
 // After this returns, the parent launches the chairman as a single child:
-//   subagent({ agent: "council-v2-chairman", task: result.chairmanTask })
+//   subagent({ agent: "council-chairman", task: result.chairmanTask })
 // then appends finding_verified + chairman_decision events to the ledger.
 
 const stage2Payload = "__STAGE1_OUTPUT__";
@@ -48,14 +51,14 @@ function fpClaim(s) {
 
 const seen = {};
 const unique = [];
-const duplicates = [];
+let duplicateCount = 0;
 for (let i = 0; i < incoming.length; i++) {
   const f = incoming[i];
   const key = (f.file || "") + "|" + (f.lines || "") + "|" + fpClaim(f.claim);
   if (seen[key]) {
     seen[key].sources = seen[key].sources.concat(f.sources || []);
     seen[key].isNew = seen[key].isNew && f.isNew;
-    duplicates.push({ id: f.id, mergedInto: seen[key].id });
+    duplicateCount++;
   } else {
     seen[key] = f;
     unique.push(f);
@@ -79,9 +82,9 @@ for (let i = 0; i < unique.length; i++) {
     classification: f.classification,
   };
   jobs.push({
-    key: "verify-" + f.id,
-    agent: "council-v2-verifier",
-    label: "verify " + f.id,
+    key: "verify-" + (i + 1),
+    agent: "council-verifier",
+    label: "verify finding " + (i + 1) + "/" + unique.length + ": " + (f.file || "") + " " + (f.lines || ""),
     model: VERIFIER_MODEL,
     task:
       "Change scope: " +
@@ -210,6 +213,7 @@ const signalIncoming = incoming.filter(isSignal);
 const signalUnique = unique.filter(isSignal);
 const newUnique = signalUnique.filter((f) => f.isNew).length;
 
+const upheld = results.filter((r) => r.verdict === "UPHELD");
 const lines = [];
 lines.push(
   "Act as the council chairman for round " + round + " of: " + task + ".",
@@ -220,28 +224,30 @@ lines.push(
     ". Out-of-scope findings stand only when they break correctness of the in-scope change.",
 );
 lines.push(
-  "Decide from verifier verdicts below. Refuted findings are excluded.",
+  "Below are the confirmed issues. Each one was found by a reviewer and checked against the code. Rejected and unsure items are already removed and must not appear in your review.",
 );
 lines.push(
   "Never list test/lint/build runs or coverage gaps as fixes. Cleanliness follows ponytail rules: shortest diff that works.",
 );
-lines.push("Consensus raises verification priority, never truth.");
 lines.push(
   "Give: FINAL VERDICT (APPROVE / REQUEST_CHANGES / NEEDS_DISCUSSION),",
 );
-lines.push("MANDATORY FIXES (upheld P1 only, with file, lines, smallest fix),");
+lines.push("MANDATORY FIXES (P1 only, with file, lines, smallest fix),");
+lines.push("RECOMMENDED IMPROVEMENTS (P2), and LOW NOTES (P3, cap 5, non-blocking).");
 lines.push(
-  "RECOMMENDED IMPROVEMENTS (upheld P2), LOW NOTES (upheld P3, cap 5, non-blocking), CONFLICT RESOLUTION, and INCONCLUSIVE ITEMS.",
+  "Marking rule: reproduce each issue's two tags verbatim in every section, in the form `[Pn] [<tag>] file lines — claim` (e.g. `[P2] [in-scope] gogo/models/Ride.ts 6799-6812 — ...`). Never show issue codes; this task has none. Never drop the classification tag; the parent quotes these lines directly into chat and into the memo.",
 );
 lines.push("Be decisive. Do not edit files.");
 lines.push("");
-for (let i = 0; i < results.length; i++) {
-  const r = results[i];
+if (upheld.length === 0) {
+  lines.push("No confirmed issues this round.");
+  lines.push("");
+}
+for (let i = 0; i < upheld.length; i++) {
+  const r = upheld[i];
   lines.push(
-    "Finding " +
-      r.finding.id +
-      (r.finding.isNew ? " [NEW]" : " [SEEN]") +
-      " [" +
+    (r.finding.isNew ? "[NEW] " : "[SEEN] ") +
+      "[" +
       r.finding.severity +
       " " +
       r.finding.classification +
@@ -252,24 +258,16 @@ for (let i = 0; i < results.length; i++) {
       " — " +
       r.finding.claim,
   );
-  lines.push(
-    "Reviewer model: " +
-      (r.finding.reviewerModel || reviewerModel || "unknown") +
-      ". Verifier model: " +
-      (r.verifierModel || "unknown") +
-      ".",
-  );
   lines.push("Claim: " + r.finding.claim);
   lines.push("Reviewer evidence: " + r.finding.evidence);
-  lines.push("Verdict: " + r.verdict + ". " + r.reason);
-  lines.push("Verifier evidence: " + r.evidence);
+  lines.push("Why it stands: " + r.reason);
+  lines.push("Check evidence: " + r.evidence);
   lines.push("");
 }
-if (duplicates.length > 0) {
-  lines.push("Deduped (" + duplicates.length + " merged):");
-  for (let i = 0; i < duplicates.length; i++) {
-    lines.push(duplicates[i].id + " merged into " + duplicates[i].mergedInto);
-  }
+if (duplicateCount > 0) {
+  lines.push(
+    "Merged " + duplicateCount + " repeat report(s) into the issues above.",
+  );
   lines.push("");
 }
 
@@ -321,7 +319,8 @@ return {
   reviewerModel: reviewerModel,
   verifierModel: VERIFIER_MODEL,
   uniqueCount: unique.length,
-  duplicateCount: duplicates.length,
+  duplicateCount: duplicateCount,
+  upheldCount: upheld.length,
   unparseableVerdicts: unparseableVerdicts,
   newUpheldP3: newUpheldP3,
   convergence: {

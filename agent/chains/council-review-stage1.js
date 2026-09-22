@@ -1,13 +1,14 @@
-// Council review v2, stage 1 of 3: independent structured-findings reviewers.
-// Six reviewers: two independent copies per angle (edge, callers, simplify).
+// Council review, stage 1 of 3: independent structured-findings reviewers.
+// N reviewers per angle (edge, callers, simplify): MODELS maps each category to
+// its list of models, one reviewer per entry, each on a different model.
 // Invoke as workflowScript (not workflowScriptPath) so resume-retry-guard injects retryAll:
-//   subagent({ workflowScript: <this file>, async: true, globalConcurrencyLimit: 6 })
+//   subagent({ workflowScript: <this file>, async: true, globalConcurrencyLimit: <total reviewers> })
 // Edit `task`, `TICKET`, `ledgerSummary`, `PRIOR`, `ROUND`, and `MODELS` before launch.
-// `MODELS` sets one primary model per category so different models work together;
-// both copies in a category share its model. Per-agent fallbackModels live in the
-// agent frontmatter (~/.pi/agent/agents/council-v2-*.md), not here.
+// `MODELS` sets the per-category model lists; lists may differ in length per
+// category. Per-agent fallbackModels live in the
+// agent frontmatter (~/.pi/agent/agents/council-*.md), not here.
 // After this returns, the parent embeds result.stage2Payload into
-// council-review-v2-stage2.js (`const stage2Payload = ...`) and launches it.
+// council-review-stage2.js (`const stage2Payload = ...`) and launches it.
 // Chairman is a separate single-child launch afterwards (no workflow needed).
 
 const task = "the current change";
@@ -16,9 +17,18 @@ const ledgerSummary = "";
 const PRIOR = "";
 const ROUND = 1;
 const MODELS = {
-  edge: "commandcode/meta/muse-spark-1.3-contributor",
-  callers: "commandcode/deepseek/deepseek-v4.1-flash",
-  simplify: "github-copilot/gpt-5.6-luna",
+  edge: [
+    "commandcode/meta/muse-spark-1.3-contributor",
+    "commandcode/deepseek/deepseek-v4.1-flash",
+  ],
+  callers: [
+    "commandcode/meta/muse-spark-1.3-contributor",
+    "commandcode/deepseek/deepseek-v4.1-flash",
+  ],
+  simplify: [
+    "commandcode/meta/muse-spark-1.3-contributor",
+    "commandcode/deepseek/deepseek-v4.1-flash",
+  ],
 };
 
 const angles = {
@@ -29,17 +39,30 @@ const angles = {
     "correctness angle C (simplification risk): does the change do more than the ticket needs, can a smaller diff hold the same behavior, flag dead code and speculative structure",
 };
 
-// Two independent copies per category: 6 reviewers total. Copies share the
-// category angle and model; stage 2 dedupe merges identical claims into one
-// finding with multiple sources, so cross-copy consensus raises verification
-// priority without double-counting.
+// One reviewer per MODELS entry: each category runs len(MODELS[category])
+// independent reviewers, each on a different model. Lists may differ in length
+// per category. Stage 2 dedupe merges identical claims into one finding with
+// multiple sources, so cross-reviewer consensus raises verification priority
+// without double-counting.
+function asList(v, category) {
+  const list = Array.isArray(v) ? v : [v];
+  if (list.length === 0 || !list.every((m) => typeof m === "string" && m)) {
+    throw new Error(
+      "MODELS." + category + " must be a non-empty list of model strings.",
+    );
+  }
+  return list;
+}
 const reviewers = [];
 for (const category of ["edge", "callers", "simplify"]) {
-  for (let copy = 1; copy <= 2; copy++) {
+  const models = asList(MODELS[category], category);
+  for (let copy = 1; copy <= models.length; copy++) {
     reviewers.push({
       key: category + "-" + copy,
       category: category,
       copy: copy,
+      total: models.length,
+      model: models[copy - 1],
       angle: angles[category],
     });
   }
@@ -55,9 +78,17 @@ const jobs = [];
 for (const r of reviewers) {
   jobs.push({
     key: "r" + ROUND + "-" + r.key,
-    agent: "council-v2-reviewer",
-    label: r.category + " review " + r.copy + "/2 (round " + ROUND + ")",
-    model: MODELS[r.category],
+    agent: "council-reviewer",
+    label:
+      r.category +
+      " review " +
+      r.copy +
+      "/" +
+      r.total +
+      " (round " +
+      ROUND +
+      ")",
+    model: r.model,
     task:
       "Review " +
       task +
@@ -65,7 +96,9 @@ for (const r of reviewers) {
       r.angle +
       ". You are independent copy " +
       r.copy +
-      " of 2 on this angle; judge from the code alone, do not coordinate." +
+      " of " +
+      r.total +
+      " on this angle; judge from the code alone, do not coordinate." +
       " Aspect: correctness. Round: " +
       ROUND +
       ".\nTicket scope (out-of-scope code only when it breaks correctness):\n" +
@@ -141,8 +174,6 @@ function normalizeSeverity(s) {
   if (/\bp1\b/.test(v)) return "P1";
   return "P2";
 }
-
-const VALID_TAGS = ["[in-scope]", "[regression]", "[pre-existing]"];
 
 function normalizeClassification(s) {
   const v = String(s || "").toLowerCase();
@@ -232,14 +263,16 @@ for (let i = 0; i < jobs.length; i++) {
 const priorCount = Object.keys(priorSet).length;
 
 const reviewerModels = {
-  edge: MODELS.edge,
-  callers: MODELS.callers,
-  simplify: MODELS.simplify,
+  edge: asList(MODELS.edge, "edge").slice(),
+  callers: asList(MODELS.callers, "callers").slice(),
+  simplify: asList(MODELS.simplify, "simplify").slice(),
 };
-const reviewerModel =
-  MODELS.edge === MODELS.callers && MODELS.callers === MODELS.simplify
-    ? MODELS.edge
-    : "mixed";
+const distinctModels = Array.from(
+  new Set(
+    reviewerModels.edge.concat(reviewerModels.callers, reviewerModels.simplify),
+  ),
+);
+const reviewerModel = distinctModels.length === 1 ? distinctModels[0] : "mixed";
 
 return {
   round: ROUND,
