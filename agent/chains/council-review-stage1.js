@@ -69,7 +69,7 @@ const SHARED_RULES =
   "\nShared rules for every reviewer: ticket scope is a hard boundary — out-of-scope code only when it breaks correctness of the in-scope change. " +
   "Judge cleanliness by ponytail rules — shortest diff that works; one finding per cut with location, what to cut, what replaces it. " +
   "Never run test suites, typecheck, lint, or build commands; review statically only. Never report test coverage, test/lint runs, or coverage gaps as findings. " +
-  "Identifier rule: start every finding claim with both tags, `[Pn] [<tag>]`, matching the severity/classification fields (e.g. `[P1] [regression] ...`). A claim without both tags is malformed.";
+  "Identifier rule: start every internal finding claim with `[Pn] [<tag>]`, matching severity/classification (e.g. `[P1] [regression] ...`). Set the separate `kind` field to req, bug, risk, opinion, or cleanup. Missing claim tags or kind is malformed.";
 
 const jobs = [];
 for (const r of reviewers) {
@@ -233,6 +233,12 @@ for (let i = 0; i < jobs.length; i++) {
   const items = parsed.items;
   for (let j = 0; j < items.length; j++) {
     const f = items[j] || {};
+    const kind = String(f.kind || "").trim();
+    if (!["req", "bug", "risk", "opinion", "cleanup"].includes(kind)) {
+      reviewStatus[job.key] = "[review ok BUT MALFORMED FINDING: invalid kind at item " + (j + 1) + "]";
+      if (!parseFailures.includes(job.key)) parseFailures.push(job.key);
+      continue;
+    }
     const fp =
       (f.file || "") + "|" + (f.lines || "") + "|" + normClaim(f.claim);
     const sev = normalizeSeverity(f.severity);
@@ -251,6 +257,7 @@ for (let i = 0; i < jobs.length; i++) {
       severity: sev,
       confidence: f.confidence || "low",
       classification: cls,
+      kind: kind,
       reviewerModel: jobs[i].model,
       sources: [job.key],
     });

@@ -116,12 +116,12 @@ Structure your findings clearly:
 ## Review
 - Correct: what is already good (with evidence)
 - Fixed: issue, location, and resolution (if you applied a fix)
-- Finding: P0/P1/P2, issue, location, evidence, and smallest fix
+- Finding: [P0/P1/P2] [classification] [kind] path lines — issue; evidence and smallest fix
 - Ledger: which prior findings this round confirmed, overturned, or pushed back on (when a ledger is given)
 - Merge verdict: BLOCK, OK, or OK with notes
 ```
 
-When reviewing code, cite file paths and line numbers. When reviewing plans, cite specific sections and assumptions.
+When reviewing code, cite file paths and line numbers. When reviewing plans, cite specific sections and assumptions. Every reader-facing finding has exactly one kind: `[req]` (named requirement mismatch), `[bug]` (incorrect processing), `[risk]` (plausible timing or edge hazard), `[opinion]` (preference), or `[cleanup]` (dead or stale code). Do not display finding IDs; keep them in ledgers only.
 
 Filter findings by evidence, not by severity. Report only concrete current issues
 that are caused or made reachable by the target diff, and support each one with

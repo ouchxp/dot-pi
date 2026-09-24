@@ -32,14 +32,14 @@ Append one JSON object per line. Never rewrite history. Finding rows carry `fp` 
 {"ts": "<iso>", "round": 1, "type": "run_started|finding_created|finding_verified|chairman_decision|human_override", "id": "<finding id>", "fp": "<fingerprint>", "reviewerModel": "<model>", "verifierModel": "<model>", "verdict": "UPHELD|REFUTED|INCONCLUSIVE", "file": "<path>", "lines": "<start-end>", "claim": "<text>", "note": "<reason>"}
 ```
 
-Append `finding_created` rows (with `reviewerModel`, `fp`) after stage 1, `finding_verified` rows (with both models) after stage 2, and `chairman_decision` (with `reviewerModel`, `verifierModel`, chairman model, plus the convergence numbers) after the chairman. Record user fix or dismiss decisions as `human_override`. Stage 1 syncs every finding claim to start with `[Pn] [<tag>]` matching its `severity`/`classification` fields, so the tags travel with the claim into the ledger, stage 2, and the chairman task — never strip them when copying a claim between representations.
+Append `finding_created` rows (with `reviewerModel`, `fp`) after stage 1, `finding_verified` rows (with both models) after stage 2, and `chairman_decision` (with `reviewerModel`, `verifierModel`, chairman model, plus the convergence numbers) after the chairman. Record user fix or dismiss decisions as `human_override`. Stage 1 syncs each internal claim's `[Pn] [<tag>]` prefix with its `severity`/`classification` fields and carries its `kind` field separately through verification. Finding IDs stay in ledger and JSON only.
 
 ## 3. Launch sequence
 
 1. Stage 1: copy stage1 file content, replace `task`, `TICKET`, `ledgerSummary`, `ROUND`, `PRIOR` (JSON array of prior-round `fp` fingerprints from the ledger; `[]` on round 1), and `MODELS` (per-category model lists: `edge`, `callers`, `simplify`, each a list of model strings, one reviewer per entry, each on a different model; lists may differ in length). Keep the defaults unless the user asked to change models. Launch one async `subagent({ workflowScript, async: true, globalConcurrencyLimit: <total reviewers> })` where total is the sum of the three list lengths (6 with defaults).
 2. Append `finding_created` events from `result.findings` (include each finding's `fp`). When `result.parseFailures` is non-empty, stop: recover the raw output from the failed child run logs first, never proceed to stage 2 with a silently thinned set. Then embed `result.stage2Payload` into the stage2 file placeholder and launch it the same way: `subagent({ workflowScript, async: true, globalConcurrencyLimit: 6 })`.
 3. Append `finding_verified` events from `result.results` (reviewer plus verifier models; the ledger keeps every verdict). The chairman task (`result.chairmanTask`) already carries confirmed issues only — repeats merged into one line each, rejected and unsure items left out, no codes. Launch the chairman as a single child: `subagent({ agent: "council-chairman", task: result.chairmanTask })`. Pass the chairman model used into the stats row. When `result.unparseableVerdicts` is non-empty, add one plain-words line to the memo giving the count and pointing at the run logs — no codes, no findings. Convergence numbers are P1/P2 signal only — P3 never enters them (see section 5).
-4. Append `chairman_decision` (copy the chairman's CONVERGENCE line plus `result.convergence` from stage 2) and write the memo `<slug>.md` with verdict, mandatory fixes, recommended improvements, low notes, merged count, convergence line, and run ids. Every issue in the memo MUST carry both tags inline as `[Pn] [<tag>] file lines` — never show an issue without both tags, never show codes. Use plain words throughout, no fancy terms.
+4. Append `chairman_decision` (copy the chairman's CONVERGENCE line plus `result.convergence` from stage 2) and write the memo `<slug>.md` with verdict, mandatory fixes, recommended improvements, low notes, merged count, convergence line, and run ids. Every issue in the memo MUST carry all three tags inline as `[Pn] [<classification>] [<kind>] file lines` — never show an issue without all three tags or show finding IDs. Use plain words throughout, no fancy terms.
 5. Append one round row to `~/.pi/council-review-model-stats.jsonl` (see section 5), including the convergence numbers. Do this every round, no exceptions.
 
 Round N plus 1 reuses the ledger: collect all prior `fp` values (all severities) into the next round's `PRIOR`, so `isNew` flags only genuinely new claims.
@@ -75,17 +75,17 @@ Per-subagent primaries: stage1 `MODELS` maps each category (`edge`, `callers`, `
 
 ## Reporting rule (mandatory)
 
-Every surface the reader sees — memo, chat reply — shows each confirmed issue once, in plain words, in the form `[Pn] [<tag>] <path> <lines> — <claim>`. No codes anywhere the reader looks; codes live in JSON and ledger rows only, never in prose.
+Every surface the reader sees — memo, chat reply — shows each confirmed issue once, in plain words, in the form `[Pn] [<classification>] [<kind>] <path> <lines> — <claim>`. Finding IDs live in JSON and ledger rows only, never in reader-facing prose.
 
 ```
-[P2] [in-scope] gogo/models/Ride.ts 6799-6812 — completed-but-unpaid rides charged after the deploy lose the $5 tip
+[P2] [in-scope] [bug] gogo/models/Ride.ts 6799-6812 — completed-but-unpaid rides charged after the deploy lose the $5 tip
 ```
 
 - Repeats are merged: one line per issue. The merged-away copies are not listed, and there is no merged-into list.
 - Rejected and unsure items never surface: no refuted list, no conflict section, no inconclusive section. They stay in the ledger only.
-- Both tags are mandatory on every mention, in every section, including chat summaries and "notes for the owner". Dropping the classification tag to shorten a line is not compression, it is lost evidence.
-- Never group issues under a bare severity heading, never restate a claim in prose without its tags.
-- Pre-send check before the chat report and before writing the memo: every issue line contains `[Pn]`, `[<tag>]`, path, and lines, and no `[R...]` code. If any line fails this check, fix it before sending.
+- All three tags are mandatory on every mention, in every section, including chat summaries and "notes for the owner". Dropping one to shorten a line loses evidence.
+- Never group issues under a bare severity heading or restate a claim in prose without its tags.
+- Pre-send check before the chat report and memo: every issue line contains `[Pn]`, `[<classification>]`, `[<kind>]`, path, and lines, and no finding ID. If any line fails, fix it before sending.
 
 ## Notes
 

@@ -80,6 +80,7 @@ for (let i = 0; i < unique.length; i++) {
     severity: f.severity,
     confidence: f.confidence,
     classification: f.classification,
+    kind: f.kind,
   };
   jobs.push({
     key: "verify-" + (i + 1),
@@ -245,7 +246,7 @@ lines.push(
   "RECOMMENDED IMPROVEMENTS (P2), and LOW NOTES (P3, cap 5, non-blocking).",
 );
 lines.push(
-  "Marking rule: reproduce each issue's two tags verbatim in every section, in the form `[Pn] [<tag>] file lines — claim` (e.g. `[P2] [in-scope] gogo/models/Ride.ts 6799-6812 — ...`). Never show issue codes; this task has none. Never drop the classification tag; the parent quotes these lines directly into chat and into the memo.",
+  "Marking rule: reproduce each issue's three tags verbatim in every section, in the form `[Pn] [<classification>] [<kind>] file lines — claim` (e.g. `[P2] [in-scope] [bug] gogo/models/Ride.ts 6799-6812 — ...`). Never show finding IDs; this task has none. The parent quotes these lines directly into chat and the memo.",
 );
 lines.push("Be decisive. Do not edit files.");
 lines.push("");
@@ -256,19 +257,12 @@ if (upheld.length === 0) {
 for (let i = 0; i < upheld.length; i++) {
   const r = upheld[i];
   lines.push(
-    (r.finding.isNew ? "[NEW] " : "[SEEN] ") +
-      "[" +
-      r.finding.severity +
-      " " +
-      r.finding.classification +
-      "] " +
-      r.finding.file +
-      " " +
-      r.finding.lines +
-      " — " +
-      r.finding.claim,
+    "[" + r.finding.severity + "] " +
+      r.finding.classification + " [" + r.finding.kind + "] " +
+      r.finding.file + " " + r.finding.lines + " — " +
+      r.finding.claim.replace(/^\[p[0123]\]\s*\[(?:in-scope|regression|pre-existing)\]\s*/i, "") +
+      (r.finding.isNew ? " (new)" : " (previous round)"),
   );
-  lines.push("Claim: " + r.finding.claim);
   lines.push("Reviewer evidence: " + r.finding.evidence);
   lines.push("Why it stands: " + r.reason);
   lines.push("Check evidence: " + r.evidence);
