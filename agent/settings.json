@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.87.1",
+  "lastChangelogVersion": "0.99.1",
   "theme": "dark",
   "defaultProvider": "commandcode",
   "defaultModel": "deepseek/deepseek-v4.1-flash",
@@ -35,11 +35,11 @@
         "thinking": "max"
       },
       "delegate": {
-        "model": "openai-codex/gpt-6-luna",
+        "model": "openai/gpt-6-luna",
         "thinking": "max"
       },
       "researcher": {
-        "model": "openai-codex/gpt-6-luna",
+        "model": "openai/gpt-6-luna",
         "thinking": "max"
       },
       "worker": {
@@ -47,12 +47,12 @@
         "thinking": "max"
       },
       "reviewer": {
-        "model": "openai-codex/gpt-6-astra",
+        "model": "openai/gpt-6-astra",
         "thinking": "high",
         "timeoutMs": 7200000
       },
       "oracle": {
-        "model": "openai-codex/gpt-6-astra",
+        "model": "openai/gpt-6-astra",
         "thinking": "xhigh",
         "timeoutMs": 7200000
       }
@@ -61,7 +61,7 @@
       "enabled": false,
       "main": {
         "enabled": false,
-        "model": "openai-codex/gpt-6-sol",
+        "model": "openai/gpt-6-sol",
         "thinking": "xhigh"
       }
     }
@@ -71,5 +71,6 @@
   "forkContext": {
     "mode": "pruned",
     "model": "commandcode/deepseek/deepseek-v4.1-flash:low"
-  }
+  },
+  "deviceId": "564e4081-bb2c-4493-90a8-47fe623d5ff5"
 }

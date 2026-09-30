@@ -17,15 +17,9 @@ const ledgerSummary = "";
 const PRIOR = "";
 const ROUND = 1;
 const MODELS = {
-  edge: ["openai-codex/gpt-6-luna", "commandcode/deepseek/deepseek-v4.1-flash"],
-  callers: [
-    "openai-codex/gpt-6-luna",
-    "commandcode/deepseek/deepseek-v4.1-flash",
-  ],
-  simplify: [
-    "openai-codex/gpt-6-luna",
-    "commandcode/deepseek/deepseek-v4.1-flash",
-  ],
+  edge: ["openai/gpt-6-luna", "commandcode/deepseek/deepseek-v4.1-flash"],
+  callers: ["openai/gpt-6-luna", "commandcode/deepseek/deepseek-v4.1-flash"],
+  simplify: ["openai/gpt-6-luna", "commandcode/deepseek/deepseek-v4.1-flash"],
 };
 
 const angles = {
@@ -235,7 +229,10 @@ for (let i = 0; i < jobs.length; i++) {
     const f = items[j] || {};
     const kind = String(f.kind || "").trim();
     if (!["req", "bug", "risk", "opinion", "cleanup"].includes(kind)) {
-      reviewStatus[job.key] = "[review ok BUT MALFORMED FINDING: invalid kind at item " + (j + 1) + "]";
+      reviewStatus[job.key] =
+        "[review ok BUT MALFORMED FINDING: invalid kind at item " +
+        (j + 1) +
+        "]";
       if (!parseFailures.includes(job.key)) parseFailures.push(job.key);
       continue;
     }

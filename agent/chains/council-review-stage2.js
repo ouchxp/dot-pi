@@ -16,7 +16,7 @@
 // then appends finding_verified + chairman_decision events to the ledger.
 
 const stage2Payload = "__STAGE1_OUTPUT__";
-const VERIFIER_MODEL = "openai-codex/gpt-6-luna";
+const VERIFIER_MODEL = "openai/gpt-6-luna";
 
 let payload;
 try {
@@ -257,10 +257,21 @@ if (upheld.length === 0) {
 for (let i = 0; i < upheld.length; i++) {
   const r = upheld[i];
   lines.push(
-    "[" + r.finding.severity + "] " +
-      r.finding.classification + " [" + r.finding.kind + "] " +
-      r.finding.file + " " + r.finding.lines + " — " +
-      r.finding.claim.replace(/^\[p[0123]\]\s*\[(?:in-scope|regression|pre-existing)\]\s*/i, "") +
+    "[" +
+      r.finding.severity +
+      "] " +
+      r.finding.classification +
+      " [" +
+      r.finding.kind +
+      "] " +
+      r.finding.file +
+      " " +
+      r.finding.lines +
+      " — " +
+      r.finding.claim.replace(
+        /^\[p[0123]\]\s*\[(?:in-scope|regression|pre-existing)\]\s*/i,
+        "",
+      ) +
       (r.finding.isNew ? " (new)" : " (previous round)"),
   );
   lines.push("Reviewer evidence: " + r.finding.evidence);

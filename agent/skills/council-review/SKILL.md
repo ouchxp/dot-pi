@@ -10,7 +10,7 @@ Three stages, cheap models throughout. Findings ledger is mandatory and survives
 ## Files
 
 - Chain: `~/.pi/agent/chains/council-review-stage1.js`, `~/.pi/agent/chains/council-review-stage2.js`
-- Agents: `council-reviewer`, `council-verifier`, `council-chairman` (chairman primary `openai-codex/gpt-6-astra` at `thinking: high`, fallback `commandcode/deepseek/deepseek-v4.1-flash` in frontmatter)
+- Agents: `council-reviewer`, `council-verifier`, `council-chairman` (chairman primary `openai/gpt-6-astra` at `thinking: high`, fallback `commandcode/deepseek/deepseek-v4.1-flash` in frontmatter)
 - Ledger: `~/Projects/ai-docs/reviews/<repo>/<slug>.jsonl` plus memo `<slug>.md` beside it
 
 ## 1. Resolve scope and ledger
@@ -29,7 +29,20 @@ Two files. The `.jsonl` ledger is per-review history (full finding details live 
 Append one JSON object per line. Never rewrite history. Finding rows carry `fp` (fingerprint `file|lines|normalized-claim`) so future rounds can match repeats:
 
 ```json
-{"ts": "<iso>", "round": 1, "type": "run_started|finding_created|finding_verified|chairman_decision|human_override", "id": "<finding id>", "fp": "<fingerprint>", "reviewerModel": "<model>", "verifierModel": "<model>", "verdict": "UPHELD|REFUTED|INCONCLUSIVE", "file": "<path>", "lines": "<start-end>", "claim": "<text>", "note": "<reason>"}
+{
+  "ts": "<iso>",
+  "round": 1,
+  "type": "run_started|finding_created|finding_verified|chairman_decision|human_override",
+  "id": "<finding id>",
+  "fp": "<fingerprint>",
+  "reviewerModel": "<model>",
+  "verifierModel": "<model>",
+  "verdict": "UPHELD|REFUTED|INCONCLUSIVE",
+  "file": "<path>",
+  "lines": "<start-end>",
+  "claim": "<text>",
+  "note": "<reason>"
+}
 ```
 
 Append `finding_created` rows (with `reviewerModel`, `fp`) after stage 1, `finding_verified` rows (with both models) after stage 2, and `chairman_decision` (with `reviewerModel`, `verifierModel`, chairman model, plus the convergence numbers) after the chairman. Record user fix or dismiss decisions as `human_override`. Stage 1 syncs each internal claim's `[Pn] [<tag>]` prefix with its `severity`/`classification` fields and carries its `kind` field separately through verification. Finding IDs stay in ledger and JSON only.
@@ -49,7 +62,26 @@ Round N plus 1 reuses the ledger: collect all prior `fp` values (all severities)
 One append-only row per review round, shared across all repos. No finding text, only counts plus tiny metadata for model choice evaluation:
 
 ```json
-{"ts": "<iso>", "repo": "<repo>", "slug": "<ticket-or-branch>", "round": 1, "reviewerModel": "<model>", "verifierModel": "<model>", "chairmanModel": "<model>", "raised": 0, "unique": 0, "newUnique": 0, "newUpheld": 0, "newUpheldP1": 0, "newUpheldP2": 0, "newUpheldP3": 0, "converged": false, "humanAccepted": 0, "humanDismissed": 0, "verdict": "APPROVE|REQUEST_CHANGES|NEEDS_DISCUSSION"}
+{
+  "ts": "<iso>",
+  "repo": "<repo>",
+  "slug": "<ticket-or-branch>",
+  "round": 1,
+  "reviewerModel": "<model>",
+  "verifierModel": "<model>",
+  "chairmanModel": "<model>",
+  "raised": 0,
+  "unique": 0,
+  "newUnique": 0,
+  "newUpheld": 0,
+  "newUpheldP1": 0,
+  "newUpheldP2": 0,
+  "newUpheldP3": 0,
+  "converged": false,
+  "humanAccepted": 0,
+  "humanDismissed": 0,
+  "verdict": "APPROVE|REQUEST_CHANGES|NEEDS_DISCUSSION"
+}
 ```
 
 - `prior` is the full prior-fingerprint suppression-list size (all severities and verdicts — dedupe must suppress P3 repeats too). Every other convergence count is P1/P2 signal only: `raised`, `unique`, `newUnique`, `newUpheld`, `newUpheldP1`, `newUpheldP2` exclude P3. P3 findings are still verified and recorded in the ledger and memo as low notes, and counted once as stats-only `newUpheldP3` noise — they never enter convergence counts or the `converged` decision. `newUnique`/`newUpheld*` count only claims whose fingerprint never appeared in a prior round.

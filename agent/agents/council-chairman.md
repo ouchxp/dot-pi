@@ -3,7 +3,7 @@ name: council-chairman
 description: Decisive synthesis chairman for council-review (verdict from verified findings only)
 tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_enclosing
 defaultContext: fresh
-model: openai-codex/gpt-6-astra
+model: openai/gpt-6-astra
 fallbackModels: commandcode/deepseek/deepseek-v4.1-flash
 timeoutMs: 7200000
 thinking: high

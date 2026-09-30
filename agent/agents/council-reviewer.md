@@ -4,7 +4,7 @@ description: Structured-findings code reviewer for council-review (cheap primary
 tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_enclosing
 defaultContext: fresh
 model: commandcode/deepseek/deepseek-v4.1-flash
-fallbackModels: openai-codex/gpt-6-luna
+fallbackModels: openai/gpt-6-luna
 timeoutMs: 7200000
 thinking: max
 systemPromptMode: replace
