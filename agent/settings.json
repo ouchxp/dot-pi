@@ -4,6 +4,9 @@
   "defaultProvider": "commandcode",
   "defaultModel": "deepseek/deepseek-v4.1-flash",
   "defaultThinkingLevel": "max",
+  "defaultTools": [
+    "+codemode"
+  ],
   "collapseChangelog": true,
   "quietStartup": true,
   "shellCommandPrefix": "unset NODENV_VERSION",
@@ -11,10 +14,10 @@
   "defaultProjectTrust": "always",
   "doubleEscapeAction": "tree",
   "treeFilterMode": "no-tools",
-  "hideThinkingBlock": true,
+  "hideThinkingBlock": false,
   "editorPaddingX": 1,
   "packages": [
-    "npm:pi-subagents@0.66.0",
+    "npm:pi-subagents",
     "npm:pi-lens",
     "npm:pi-mcp-adapter",
     "npm:pi-web-access",
