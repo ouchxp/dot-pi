@@ -1,5 +1,6 @@
 # Local Pi runtime state.
 agent/auth.json
+agent/mcp.json
 agent/bin/
 agent/fff/
 agent/missions/

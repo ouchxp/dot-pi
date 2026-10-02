@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.99.1",
+  "lastChangelogVersion": "1.0.0",
   "theme": "dark",
   "defaultProvider": "commandcode",
   "defaultModel": "deepseek/deepseek-v4.1-flash",
@@ -19,7 +19,6 @@
   "packages": [
     "npm:pi-subagents",
     "npm:pi-lens",
-    "npm:pi-mcp-adapter",
     "npm:pi-web-access",
     "npm:@juicesharp/rpiv-todo",
     "npm:@narumitw/pi-btw",
@@ -75,5 +74,6 @@
     "mode": "pruned",
     "model": "commandcode/deepseek/deepseek-v4.1-flash:low"
   },
-  "deviceId": "564e4081-bb2c-4493-90a8-47fe623d5ff5"
+  "deviceId": "564e4081-bb2c-4493-90a8-47fe623d5ff5",
+  "extensions": []
 }
