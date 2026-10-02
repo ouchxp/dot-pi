@@ -1,15 +1,15 @@
 // Council review, stage 1 of 3: independent structured-findings reviewers.
 // N reviewers per angle (edge, callers, simplify): MODELS maps each category to
 // its list of models, one reviewer per entry, each on a different model.
-// Invoke as workflowScript (not workflowScriptPath) so resume-retry-guard injects retryAll:
-//   subagent({ workflowScript: <this file>, async: true, globalConcurrencyLimit: <total reviewers> })
+// Compose this stage body into the single async workflow described by the
+// council-review skill. Native runs.all needs no injected retry helpers.
 // Edit `task`, `TICKET`, `ledgerSummary`, `PRIOR`, `ROUND`, and `MODELS` before launch.
 // `MODELS` sets the per-category model lists; lists may differ in length per
 // category. Per-agent fallbackModels live in the
 // agent frontmatter (~/.pi/agent/agents/council-*.md), not here.
-// After this returns, the parent embeds result.stage2Payload into
-// council-review-stage2.js (`const stage2Payload = ...`) and launches it.
-// Chairman is a separate single-child launch afterwards (no workflow needed).
+// In the composed workflow, assign the final return object to stage1Result,
+// then pass stage1Result.stage2Payload to stage 2 in a separate block scope.
+// Stop before stage 2 if stage1Result.parseFailures is non-empty.
 
 const task = "the current change";
 const TICKET = "";
@@ -104,7 +104,7 @@ for (const r of reviewers) {
   });
 }
 
-const reviews = await retryAll(jobs);
+const reviews = await runs.all(jobs);
 
 function stripFences(text) {
   return String(text || "")

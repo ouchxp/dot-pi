@@ -2,18 +2,17 @@
 // Merges repeats so each issue is checked once. Rejected and unsure verdicts
 // stay in the ledger only; the chairman only sees confirmed (UPHELD) issues.
 // No issue codes are shown to the reader; ids live in JSON only.
-// Invoke as workflowScript (not workflowScriptPath) so resume-retry-guard injects retryAll:
-//   subagent({ workflowScript: <this file>, async: true })
-// Before launch, the parent replaces `stage2Payload` with stage 1's
-// result.stage2Payload string (exact replacement of the placeholder line).
+// Compose this stage body into the single async workflow described by the
+// council-review skill. Native runs.all needs no injected retry helpers.
+// Replace the stage2Payload placeholder with stage1Result.stage2Payload.
 // `VERIFIER_MODEL` is the single customization point for the verifier model;
 // the chairman model is chosen at its single-child launch; fallbacks live in the
 // council-verifier / council-chairman agent frontmatter.
 // Convergence counts P1/P2 signal only: P3 findings are still verified for the
 // memo low notes, but never enter the convergence tuple or the converged decision.
-// After this returns, the parent launches the chairman as a single child:
-//   subagent({ agent: "council-chairman", task: result.chairmanTask })
-// then appends finding_verified + chairman_decision events to the ledger.
+// In the composed workflow, assign the final return object to stage2Result,
+// then await the chairman inside that same workflow using stage2Result.chairmanTask.
+// The parent records the returned stage results and chairman decision in the ledger.
 
 const stage2Payload = "__STAGE1_OUTPUT__";
 const VERIFIER_MODEL = "openai/gpt-6-luna";
@@ -108,7 +107,7 @@ for (let i = 0; i < unique.length; i++) {
   });
 }
 
-const verdicts = await retryAll(jobs);
+const verdicts = await runs.all(jobs);
 
 function tryParseObject(s) {
   try {

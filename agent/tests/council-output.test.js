@@ -8,8 +8,8 @@ const chains = path.join(__dirname, "..", "chains");
 const stage1 = readFileSync(path.join(chains, "council-review-stage1.js"), "utf8");
 const stage2 = readFileSync(path.join(chains, "council-review-stage2.js"), "utf8");
 
-function run(script, retryAll) {
-  return runInNewContext(`(async () => { ${script} })()`, { retryAll });
+function run(script, all) {
+  return runInNewContext(`(async () => { ${script} })()`, { runs: { all } });
 }
 
 function review(findings) {
@@ -52,4 +52,39 @@ test("council output keeps IDs internal and displays all three tags", async () =
 
   const invalid = await review([{ ...finding, kind: undefined }]);
   assert.equal(invalid.parseFailures.length, 1);
+});
+
+test("native council batches report failures without automatically retrying", async () => {
+  let calls = 0;
+  const fail = async (jobs) => {
+    calls++;
+    return jobs.map(() => ({ ok: false, error: "interrupted", runId: "failed-run" }));
+  };
+  const first = await run(stage1, fail);
+  assert.equal(calls, 1);
+  assert.equal(first.parseFailures.length, 6);
+  assert.equal(first.findings.length, 0);
+
+  const payload = {
+    task: "the current change",
+    round: 1,
+    findings: [{ id: "finding", severity: "P2", isNew: true }],
+  };
+  const embedded = stage2.replace(
+    'const stage2Payload = "__STAGE1_OUTPUT__";',
+    `const stage2Payload = ${JSON.stringify(JSON.stringify(payload))};`,
+  );
+  const second = await run(embedded, fail);
+  assert.equal(calls, 2);
+  assert.equal(second.results[0].verdict, "INCONCLUSIVE");
+  assert.equal(second.results[0].reason, "verifier failed: interrupted");
+});
+
+test("deprecated retry extension is retained but excluded from loading", () => {
+  const agentDir = path.join(__dirname, "..");
+  const settings = JSON.parse(readFileSync(path.join(agentDir, "settings.json"), "utf8"));
+  assert.ok(settings.extensions.includes("-./extensions/resume-retry-guard.ts"));
+  const source = readFileSync(path.join(agentDir, "extensions", "resume-retry-guard.ts"), "utf8");
+  assert.match(source, /function retryRun\(/);
+  assert.match(source, /function retryAll\(/);
 });

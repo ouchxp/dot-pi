@@ -22,12 +22,12 @@ This repository contains the personal configuration and customizations used by t
   - `notify-done.ts` — sends a native terminal notification when a run finishes.
   - `openai-service-tier.ts` — applies the OpenAI `priority` service tier to configured models.
   - `pi-tool-display/config.json` — output display tuning for tool results (collapsed lines, hidden ffgrep/fffind output).
-  - `resume-retry-guard.ts` — resumes interrupted subagent workflow runs from their persisted session instead of restarting them.
+  - `resume-retry-guard.ts` — deprecated and excluded from loading by `agent/settings.json`; its source is retained unchanged for historical reference. New workflows use native `runs.run` / `runs.all`, with explicit recovery decisions rather than injected retry helpers.
   - `side-pane-fork.ts` — opens chat forks in a side pane.
   - `tps.ts` — reports token throughput and usage after an agent run.
   - `subagent/config.json` — subagent attention timeout tuning.
 - `agent/chains/` — reusable multi-agent workflows:
-  - `council-review.js` — stage 1 runs two non-GPT reviewer models (gemini, grok) across three aspects (correctness, tests, scope) in parallel (`retryAll`), then the parent launches the GPT chairman (oracle) with the returned `synthesisTask`.
+  - `council-review-stage1.js` and `council-review-stage2.js` — stage templates for reviewer fanout and independent verification using native `runs.all`. The council-review skill describes composing these stages and the chairman into one async workflow.
 - `agent/skills/council-review/SKILL.md` — skill front-end that launches the council-review chain on a branch/PR.
 
 ## Local-only state
