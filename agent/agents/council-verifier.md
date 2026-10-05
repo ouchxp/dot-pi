@@ -3,8 +3,7 @@ name: council-verifier
 description: Independent finding verifier for council-review (UPHELD/REFUTED/INCONCLUSIVE with evidence)
 tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_enclosing
 defaultContext: fresh
-model: openai/gpt-6-luna
-fallbackModels: commandcode/deepseek/deepseek-v4.1-flash
+model: magpie/group/auto-gpt-6-luna
 timeoutMs: 7200000
 thinking: max
 systemPromptMode: replace

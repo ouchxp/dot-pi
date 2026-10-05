@@ -3,7 +3,7 @@ name: oracle
 aliases: advisor
 description: High-context decision-consistency oracle that protects inherited state and prevents drift
 tools: read, grep, find, ls, bash
-model: openai/gpt-6-astra
+model: magpie/group/auto-gpt-6-astra
 timeoutMs: 7200000
 thinking: xhigh
 systemPromptMode: replace

@@ -6,8 +6,7 @@
 // council-review skill. Native runs.all needs no injected retry helpers.
 // Replace the stage2Payload placeholder with stage1Result.stage2Payload.
 // `VERIFIER_MODEL` is the single customization point for the verifier model;
-// the chairman model is chosen at its single-child launch; fallbacks live in the
-// council-verifier / council-chairman agent frontmatter.
+// the chairman model is chosen at its single-child launch.
 // Convergence counts P1/P2 signal only: P3 findings are still verified for the
 // memo low notes, but never enter the convergence tuple or the converged decision.
 // In the composed workflow, assign the final return object to stage2Result,
@@ -15,7 +14,7 @@
 // The parent records the returned stage results and chairman decision in the ledger.
 
 const stage2Payload = "__STAGE1_OUTPUT__";
-const VERIFIER_MODEL = "openai/gpt-6-luna";
+const VERIFIER_MODEL = "magpie/group/auto-gpt-6-luna";
 
 let payload;
 try {

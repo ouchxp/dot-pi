@@ -1,8 +1,8 @@
 {
-  "lastChangelogVersion": "1.0.0",
+  "defaultModel": "group/auto-gpt-6-1-sol",
+  "defaultProvider": "magpie",
+  "lastChangelogVersion": "1.0.2",
   "theme": "dark",
-  "defaultProvider": "commandcode",
-  "defaultModel": "deepseek/deepseek-v4.1-flash",
   "defaultThinkingLevel": "max",
   "defaultTools": [
     "+codemode"
@@ -33,28 +33,28 @@
   "subagents": {
     "agentOverrides": {
       "scout": {
-        "model": "commandcode/deepseek/deepseek-v4.1-flash",
+        "model": "magpie/group/auto-gpt-6-luna",
         "thinking": "max"
       },
       "delegate": {
-        "model": "openai/gpt-6-luna",
+        "model": "magpie/group/auto-gpt-6-luna",
         "thinking": "max"
       },
       "researcher": {
-        "model": "openai/gpt-6-luna",
+        "model": "magpie/group/auto-gpt-6-luna",
         "thinking": "max"
       },
       "worker": {
-        "model": "commandcode/deepseek/deepseek-v4.1-flash",
+        "model": "magpie/group/auto-gpt-6-luna",
         "thinking": "max"
       },
       "reviewer": {
-        "model": "openai/gpt-6-astra",
+        "model": "magpie/group/auto-gpt-6-astra",
         "thinking": "high",
         "timeoutMs": 7200000
       },
       "oracle": {
-        "model": "openai/gpt-6-astra",
+        "model": "magpie/group/auto-gpt-6-astra",
         "thinking": "xhigh",
         "timeoutMs": 7200000
       }
@@ -63,7 +63,7 @@
       "enabled": false,
       "main": {
         "enabled": false,
-        "model": "openai/gpt-6-sol",
+        "model": "magpie/group/auto-gpt-6-1-sol",
         "thinking": "xhigh"
       }
     }
@@ -72,10 +72,11 @@
   "transport": "auto",
   "forkContext": {
     "mode": "pruned",
-    "model": "commandcode/deepseek/deepseek-v4.1-flash:low"
+    "model": "magpie/group/auto-gpt-6-luna:low"
   },
   "deviceId": "564e4081-bb2c-4493-90a8-47fe623d5ff5",
   "extensions": [
-    "-./extensions/resume-retry-guard.ts"
+    "-./extensions/resume-retry-guard.ts",
+    "-./extensions/cursor-acp.ts"
   ]
 }

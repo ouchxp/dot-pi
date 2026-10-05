@@ -5,8 +5,7 @@
 // council-review skill. Native runs.all needs no injected retry helpers.
 // Edit `task`, `TICKET`, `ledgerSummary`, `PRIOR`, `ROUND`, and `MODELS` before launch.
 // `MODELS` sets the per-category model lists; lists may differ in length per
-// category. Per-agent fallbackModels live in the
-// agent frontmatter (~/.pi/agent/agents/council-*.md), not here.
+// category. Each child launches once with its selected model.
 // In the composed workflow, assign the final return object to stage1Result,
 // then pass stage1Result.stage2Payload to stage 2 in a separate block scope.
 // Stop before stage 2 if stage1Result.parseFailures is non-empty.
@@ -17,9 +16,9 @@ const ledgerSummary = "";
 const PRIOR = "";
 const ROUND = 1;
 const MODELS = {
-  edge: ["openai/gpt-6-luna", "commandcode/deepseek/deepseek-v4.1-flash"],
-  callers: ["openai/gpt-6-luna", "commandcode/deepseek/deepseek-v4.1-flash"],
-  simplify: ["openai/gpt-6-luna", "commandcode/deepseek/deepseek-v4.1-flash"],
+  edge: ["magpie/group/auto-gpt-6-luna", "magpie/group/auto-gpt-6-luna"],
+  callers: ["magpie/group/auto-gpt-6-luna", "magpie/group/auto-gpt-6-luna"],
+  simplify: ["magpie/group/auto-gpt-6-luna", "magpie/group/auto-gpt-6-luna"],
 };
 
 const angles = {

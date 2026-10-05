@@ -10,7 +10,7 @@ Three stages, cheap models throughout. Findings ledger is mandatory and survives
 ## Files
 
 - Chain: `~/.pi/agent/chains/council-review-stage1.js`, `~/.pi/agent/chains/council-review-stage2.js`
-- Agents: `council-reviewer`, `council-verifier`, `council-chairman` (chairman primary `openai/gpt-6-astra` at `thinking: high`, fallback `commandcode/deepseek/deepseek-v4.1-flash` in frontmatter)
+- Agents: `council-reviewer`, `council-verifier`, `council-chairman` (chairman primary `magpie/group/auto-gpt-6-astra` at `thinking: high`)
 - Ledger: `~/Projects/ai-docs/reviews/<repo>/<slug>.jsonl` plus memo `<slug>.md` beside it
 
 ## 1. Resolve scope and ledger
@@ -105,7 +105,7 @@ GROUP BY 1 ORDER BY new_signal_rate DESC;
 
 ## 4. Model customization
 
-Per-subagent primaries: stage1 `MODELS` maps each category (`edge`, `callers`, `simplify`) to its list of models (one reviewer per entry, each on a different model); stage2 `VERIFIER_MODEL` sets the verifier; the chairman model is chosen through its native job's `model` field in the composed workflow. Fallbacks stay in agent frontmatter `fallbackModels`. Each finding carries its reviewer's exact model in `reviewerModel`. Stage 1 also reports aggregate `reviewerModel` (the single model when every list holds that same one entry, else `"mixed"`) plus the per-category lists in `reviewerModels` for the stats row. Never add per-child model logic elsewhere.
+Per-subagent primaries: stage1 `MODELS` maps each category (`edge`, `callers`, `simplify`) to its list of models (one reviewer per entry, each on a different model); stage2 `VERIFIER_MODEL` sets the verifier; the chairman model is chosen through its native job's `model` field in the composed workflow. Each child launches once with its selected model; fallback models are not supported. Each finding carries its reviewer's exact model in `reviewerModel`. Stage 1 also reports aggregate `reviewerModel` (the single model when every list holds that same one entry, else `"mixed"`) plus the per-category lists in `reviewerModels` for the stats row. Never add per-child model logic elsewhere.
 
 ## Reporting rule (mandatory)
 
