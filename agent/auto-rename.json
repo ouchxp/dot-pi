@@ -3,6 +3,6 @@
     "prompt": "Create a concise session title based on the request below. Use 3-8 words. If a ticket number such as ENG-14442 appears in the request, preserve it exactly as the first part of the title. Do not invent a ticket number. Return ONLY the title as plain text, with no Markdown or quotes.\n\nRequest:\n{{query}}",
     "model": {
         "provider": "magpie",
-        "id": "group/auto-gpt-6-luna"
+        "id": "group/deepseek-v4-1-flash"
     }
 }

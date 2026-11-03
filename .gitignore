@@ -11,6 +11,7 @@ agent/npm/
 agent/run-history.jsonl
 agent/sessions/
 agent/pi-subagents/last-seen-version.json
+agent/pi-web-access/last-seen-version.json
 web-search-cache/
 mcp-cache.json
 mcp-npx-cache.json

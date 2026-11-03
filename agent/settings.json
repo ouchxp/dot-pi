@@ -1,7 +1,7 @@
 {
-  "defaultModel": "group/auto-gpt-6-1-sol",
+  "defaultModel": "auto/gpt-6.1-sol",
   "defaultProvider": "magpie",
-  "lastChangelogVersion": "1.1.0",
+  "lastChangelogVersion": "1.5.0",
   "theme": "dark",
   "defaultThinkingLevel": "max",
   "defaultTools": [
@@ -33,30 +33,28 @@
   "subagents": {
     "agentOverrides": {
       "scout": {
-        "model": "magpie/group/auto-gpt-6-luna",
+        "model": "magpie/group/deepseek-v4-1-flash",
         "thinking": "max"
       },
       "delegate": {
-        "model": "magpie/group/auto-gpt-6-luna",
+        "model": "magpie/group/deepseek-v4-1-flash",
         "thinking": "max"
       },
       "researcher": {
-        "model": "magpie/group/auto-gpt-6-luna",
+        "model": "magpie/group/deepseek-v4-1-flash",
         "thinking": "max"
       },
       "worker": {
-        "model": "magpie/group/auto-gpt-6-luna",
+        "model": "magpie/group/deepseek-v4-1-flash",
         "thinking": "max"
       },
       "reviewer": {
-        "model": "magpie/group/auto-gpt-6-astra",
-        "thinking": "high",
-        "timeoutMs": 7200000
+        "model": "magpie/group/auto-gpt-6-1-sol",
+        "thinking": "high"
       },
       "oracle": {
-        "model": "magpie/group/auto-gpt-6-astra",
-        "thinking": "xhigh",
-        "timeoutMs": 7200000
+        "model": "magpie/group/auto-gpt-6-1-sol",
+        "thinking": "xhigh"
       }
     },
     "watchdog": {
@@ -78,5 +76,11 @@
   "extensions": [
     "-./extensions/resume-retry-guard.ts",
     "-./extensions/cursor-acp.ts"
-  ]
+  ],
+  "extensionChangelogVersions": {
+    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.84.0",
+    "{\"source\":\"npm:pi-lens\",\"scope\":\"user\"}": "4.4.8",
+    "{\"source\":\"npm:pi-web-access\",\"scope\":\"user\"}": "0.46.0",
+    "{\"source\":\"npm:pi-tool-display\",\"scope\":\"user\"}": "0.5.0"
+  }
 }
