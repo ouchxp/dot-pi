@@ -1,6 +1,6 @@
 {
   "previewLines": 3,
-  "bashCollapsedLines": 5,
+  "bashCollapsedLines": 3,
   "bashOutputMode": "opencode",
   "customToolOverrides": {
     "ffgrep": {
