@@ -3,7 +3,7 @@ name: council-reviewer
 description: Structured-findings code reviewer for council-review (cheap primary, read-only, JSON output)
 tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_enclosing
 defaultContext: fresh
-model: magpie/group/auto-gpt-6-luna
+model: magpie/group/gpt-6-luna
 timeoutMs: 7200000
 thinking: max
 systemPromptMode: replace

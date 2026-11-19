@@ -15,7 +15,25 @@ Batch independent tool calls in the same assistant turn; do not wait between ind
 
 ## Subagent Delegation
 
-Use subagents dynamically when they materially improve the result. Do not delegate trivial tasks.
+You have standing authorization to delegate within the user's approved task.
+
+Use subagents proactively for bounded discovery, research, routine implementation,
+and independent validation. The main agent owns decisions, coordination,
+integration, and final acceptance.
+
+Bundle related small tasks into one subagent assignment. Delegate discovery
+before spending many main-thread calls searching and reading files.
+
+Handle a single quick lookup or tiny, well-understood edit directly when
+delegation would cost more than the work.
+
+Delegate broad discovery when tool outputs are large and only a small subset
+is relevant to the main task.
+
+For scout tasks, specify the required depth: quick, medium, or very thorough.
+
+Do not duplicate work assigned to a subagent. Continue independent work while
+it runs; otherwise yield until its result arrives.
 
 - **scout**: inspect unfamiliar codebases, locate relevant files, trace behavior, and gather local context.
 - **researcher**: investigate external documentation, APIs, libraries, current behavior, or factual questions. For substantial research, run multiple researchers in parallel with distinct focuses.

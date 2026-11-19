@@ -14,7 +14,7 @@
 // The parent records the returned stage results and chairman decision in the ledger.
 
 const stage2Payload = "__STAGE1_OUTPUT__";
-const VERIFIER_MODEL = "magpie/group/auto-gpt-6-luna";
+const VERIFIER_MODEL = "magpie/group/gpt-6-luna";
 
 let payload;
 try {

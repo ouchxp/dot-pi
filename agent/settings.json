@@ -1,9 +1,14 @@
 {
-  "defaultModel": "auto/gpt-6.1-sol",
+  "defaultModel": "group/gemini-4-neon",
   "defaultProvider": "magpie",
-  "lastChangelogVersion": "1.5.0",
+  "lastChangelogVersion": "1.5.2",
   "theme": "dark",
   "defaultThinkingLevel": "max",
+  "modelThinkingLevels": {
+    "magpie/group/gemini-4-neon": "high",
+    "magpie/group/claude-opus-5-5": "xhigh",
+    "magpie/group/claude-sonnet-5-5": "xhigh"
+  },
   "defaultTools": [
     "+codemode"
   ],
@@ -42,26 +47,99 @@
       },
       "researcher": {
         "model": "magpie/group/deepseek-v4-1-flash",
-        "thinking": "max"
+        "thinking": "max",
+        "tools": [
+          "read",
+          "write",
+          "web_search",
+          "fetch_content",
+          "get_search_content",
+          "source_check",
+          "bash"
+        ]
       },
       "worker": {
         "model": "magpie/group/deepseek-v4-1-flash",
         "thinking": "max"
       },
       "reviewer": {
-        "model": "magpie/group/auto-gpt-6-1-sol",
-        "thinking": "high"
+        "model": "magpie/group/gpt-6-1-sol",
+        "thinking": "high",
+        "tools": [
+          "read",
+          "grep",
+          "find",
+          "ls",
+          "ffgrep",
+          "fffind",
+          "module_report",
+          "read_symbol",
+          "read_enclosing",
+          "bash"
+        ]
       },
       "oracle": {
-        "model": "magpie/group/auto-gpt-6-1-sol",
+        "model": "magpie/group/gpt-6-1-sol",
         "thinking": "xhigh"
+      },
+      "council-chairman": {
+        "tools": [
+          "read",
+          "grep",
+          "find",
+          "ls",
+          "ffgrep",
+          "fffind",
+          "module_report",
+          "read_symbol",
+          "read_enclosing",
+          "bash"
+        ]
+      },
+      "council-reviewer": {
+        "tools": [
+          "read",
+          "grep",
+          "find",
+          "ls",
+          "ffgrep",
+          "fffind",
+          "module_report",
+          "read_symbol",
+          "read_enclosing",
+          "bash"
+        ]
+      },
+      "council-verifier": {
+        "tools": [
+          "read",
+          "grep",
+          "find",
+          "ls",
+          "ffgrep",
+          "fffind",
+          "module_report",
+          "read_symbol",
+          "read_enclosing",
+          "bash"
+        ]
+      },
+      "evidence-auditor": {
+        "tools": [
+          "read",
+          "web_search",
+          "fetch_content",
+          "get_search_content",
+          "source_check",
+          "bash"
+        ]
       }
     },
     "watchdog": {
       "enabled": false,
       "main": {
         "enabled": false,
-        "model": "magpie/group/auto-gpt-6-1-sol",
+        "model": "magpie/group/gpt-6-1-sol",
         "thinking": "xhigh"
       }
     }
@@ -70,7 +148,7 @@
   "transport": "auto",
   "forkContext": {
     "mode": "pruned",
-    "model": "magpie/group/auto-gpt-6-luna:low"
+    "model": "magpie/group/gpt-6-luna:low"
   },
   "deviceId": "564e4081-bb2c-4493-90a8-47fe623d5ff5",
   "extensions": [
@@ -78,9 +156,10 @@
     "-./extensions/cursor-acp.ts"
   ],
   "extensionChangelogVersions": {
-    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.84.0",
-    "{\"source\":\"npm:pi-lens\",\"scope\":\"user\"}": "4.4.8",
-    "{\"source\":\"npm:pi-web-access\",\"scope\":\"user\"}": "0.46.0",
-    "{\"source\":\"npm:pi-tool-display\",\"scope\":\"user\"}": "0.5.0"
+    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.88.1",
+    "{\"source\":\"npm:pi-lens\",\"scope\":\"user\"}": "4.5.1",
+    "{\"source\":\"npm:pi-web-access\",\"scope\":\"user\"}": "0.48.0",
+    "{\"source\":\"npm:pi-tool-display\",\"scope\":\"user\"}": "0.5.0",
+    "{\"source\":\"npm:@narumitw/pi-btw\",\"scope\":\"user\"}": "0.63.8"
   }
 }

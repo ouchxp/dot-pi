@@ -16,12 +16,9 @@ const ledgerSummary = "";
 const PRIOR = "";
 const ROUND = 1;
 const MODELS = {
-  edge: ["magpie/group/deepseek-v4-1-flash", "magpie/group/auto-gpt-6-luna"],
-  callers: ["magpie/group/deepseek-v4-1-flash", "magpie/group/auto-gpt-6-luna"],
-  simplify: [
-    "magpie/group/deepseek-v4-1-flash",
-    "magpie/group/auto-gpt-6-luna",
-  ],
+  edge: ["magpie/group/deepseek-v4-1-flash", "magpie/group/gpt-6-luna"],
+  callers: ["magpie/group/deepseek-v4-1-flash", "magpie/group/gpt-6-luna"],
+  simplify: ["magpie/group/deepseek-v4-1-flash", "magpie/group/gpt-6-luna"],
 };
 
 const angles = {
