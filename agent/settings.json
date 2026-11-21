@@ -1,7 +1,7 @@
 {
   "defaultModel": "group/gemini-4-neon",
   "defaultProvider": "magpie",
-  "lastChangelogVersion": "1.5.2",
+  "lastChangelogVersion": "1.6.0",
   "theme": "dark",
   "defaultThinkingLevel": "max",
   "modelThinkingLevels": {
@@ -38,15 +38,18 @@
     "agentOverrides": {
       "scout": {
         "model": "magpie/group/deepseek-v4-1-flash",
-        "thinking": "max"
+        "thinking": "max",
+        "inheritSkills": true
       },
       "delegate": {
         "model": "magpie/group/deepseek-v4-1-flash",
-        "thinking": "max"
+        "thinking": "max",
+        "inheritSkills": true
       },
       "researcher": {
         "model": "magpie/group/deepseek-v4-1-flash",
         "thinking": "max",
+        "inheritSkills": true,
         "tools": [
           "read",
           "write",
@@ -59,11 +62,14 @@
       },
       "worker": {
         "model": "magpie/group/deepseek-v4-1-flash",
-        "thinking": "max"
+        "thinking": "max",
+        "inheritSkills": true
       },
       "reviewer": {
-        "model": "magpie/group/gpt-6-1-sol",
+        "model": "magpie/group/gpt-6-2-sol",
         "thinking": "high",
+        "defaultContext": "fresh",
+        "inheritSkills": true,
         "tools": [
           "read",
           "grep",
@@ -74,12 +80,29 @@
           "module_report",
           "read_symbol",
           "read_enclosing",
-          "bash"
+          "bash",
+          "contact_supervisor"
+        ],
+        "subagentOnlyExtensions": [
+          "/Users/nanw/.pi/agent/subagent-extensions/static-review-guard.ts",
+          "/Users/nanw/.pi/agent/subagent-extensions/reviewer-policy.ts"
         ]
       },
       "oracle": {
-        "model": "magpie/group/gpt-6-1-sol",
-        "thinking": "xhigh"
+        "model": "magpie/group/gpt-6-2-sol",
+        "thinking": "xhigh",
+        "inheritSkills": true,
+        "tools": [
+          "read",
+          "grep",
+          "find",
+          "ls",
+          "bash",
+          "contact_supervisor"
+        ],
+        "subagentOnlyExtensions": [
+          "/Users/nanw/.pi/agent/subagent-extensions/static-review-guard.ts"
+        ]
       },
       "council-chairman": {
         "tools": [
@@ -124,6 +147,7 @@
         ]
       },
       "evidence-auditor": {
+        "inheritSkills": true,
         "tools": [
           "read",
           "web_search",
@@ -138,7 +162,7 @@
       "enabled": false,
       "main": {
         "enabled": false,
-        "model": "magpie/group/gpt-6-1-sol",
+        "model": "magpie/group/gpt-6-2-sol",
         "thinking": "xhigh"
       }
     }
@@ -155,7 +179,7 @@
     "-./extensions/cursor-acp.ts"
   ],
   "extensionChangelogVersions": {
-    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.88.1",
+    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.89.1",
     "{\"source\":\"npm:pi-lens\",\"scope\":\"user\"}": "4.5.1",
     "{\"source\":\"npm:pi-web-access\",\"scope\":\"user\"}": "0.48.0",
     "{\"source\":\"npm:pi-tool-display\",\"scope\":\"user\"}": "0.5.0",

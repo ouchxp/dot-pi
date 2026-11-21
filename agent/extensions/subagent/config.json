@@ -1,4 +1,5 @@
 {
+	"timeoutMs": 7200000,
 	"control": {
 		"needsAttentionAfterMs": 600000
 	},

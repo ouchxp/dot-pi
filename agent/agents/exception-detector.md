@@ -3,7 +3,7 @@ name: exception-detector
 description: Judgment-boundary scanner that flags unusual code a human reviewer would challenge, distinct from correctness review
 tools: read, grep, find, ls, ffgrep, fffind, module_report, read_symbol, read_enclosing, bash
 defaultContext: fresh
-model: magpie/group/gpt-6-astra
+model: magpie/group/gpt-6-2-astra
 timeoutMs: 7200000
 thinking: medium
 systemPromptMode: replace

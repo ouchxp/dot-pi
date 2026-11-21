@@ -5,10 +5,11 @@ This repository contains the personal configuration and customizations used by t
 ## Repository contents
 
 - `agent/AGENTS.md` — global agent rules: subagent delegation rules, pi-lens reporting rules, and subagent attention-looping guidance.
-- `agent/agents/` — subagent prompt definitions:
-  - `reviewer.md` — PR/code review agent; reviews statically, never runs test suites or builds.
-  - `oracle.md` — design-consultation agent; read-only analysis only.
+- `agent/agents/` — custom subagent prompt definitions (`reviewer` and `oracle` use the bundled `pi-subagents` presets configured via `agent/settings.json` + `agent/subagent-extensions/`):
   - `exception-detector.md` — scans diffs for judgment-boundary exceptions, code a human reviewer would stop at; complements reviewer on high-risk changes.
+- `agent/subagent-extensions/` — child-only extensions loaded via `subagents.agentOverrides.*.subagentOnlyExtensions` (never auto-loaded in the parent):
+  - `static-review-guard.ts` — blocks heavy verification commands (`tsc`, test suites, linters, formatters, builds) in `reviewer` and `oracle` so reviews stay static. (Filesystem read-only sandboxing via macOS `sandbox-exec` is owned by `agent/extensions/ask-mode.ts`.)
+  - `reviewer-policy.ts` — appends read-only `bash`, static-review, scope-anchoring, classification/kind tag, review-ledger, simplicity, and P2 fix-cost rules onto the bundled `reviewer` preset.
 - `agent/.i-have-adhd-always` — marker that keeps the i-have-adhd skill enabled by default.
 - `.gitignore` — keeps runtime state out of source control and excludes local `orca-*` extensions and `agent/git/`.
 - `agent/settings.json` — Pi defaults, installed packages (including the i-have-adhd skill), model settings, UI preferences, and subagent overrides.
@@ -26,7 +27,7 @@ This repository contains the personal configuration and customizations used by t
   - `resume-retry-guard.ts` — deprecated and excluded from loading by `agent/settings.json`; its source is retained unchanged for historical reference. New workflows use native `runs.run` / `runs.all`, with explicit recovery decisions rather than injected retry helpers.
   - `side-pane-fork.ts` — opens chat forks in a side pane.
   - `tps.ts` — reports token throughput and usage after an agent run.
-  - `subagent/config.json` — subagent attention timeout tuning.
+  - `subagent/config.json` — subagent runtime timeout (`timeoutMs`, 2h default for single-agent/workflow runs; async chain/parallel composites fall back to 30m unless per-call `timeoutMs` is set) and attention tuning.
 - `agent/chains/` — reusable multi-agent workflows:
   - `council-review-stage1.js` and `council-review-stage2.js` — stage templates for reviewer fanout and independent verification using native `runs.all`. The council-review skill describes composing these stages and the chairman into one async workflow.
 - `agent/skills/council-review/SKILL.md` — skill front-end that launches the council-review chain on a branch/PR.

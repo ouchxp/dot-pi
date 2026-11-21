@@ -10,7 +10,7 @@ Three stages, cheap models throughout. Findings ledger is mandatory and survives
 ## Files
 
 - Chain: `~/.pi/agent/chains/council-review-stage1.js`, `~/.pi/agent/chains/council-review-stage2.js`
-- Agents: `council-reviewer`, `council-verifier`, `council-chairman` (chairman primary `magpie/group/gpt-6-astra` at `thinking: high`)
+- Agents: `council-reviewer`, `council-verifier`, `council-chairman` (chairman primary `magpie/group/gpt-6-2-astra` at `thinking: high`)
 - Ledger: `~/Projects/ai-docs/reviews/<repo>/<slug>.jsonl` plus memo `<slug>.md` beside it
 
 ## 1. Resolve scope and ledger

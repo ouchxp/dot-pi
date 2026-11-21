@@ -75,14 +75,17 @@ function launchedAgents(): string[] | undefined {
 // the model respecting the system prompt or on deny-list pattern coverage.
 // ~/.mycli.log and ~/.mycli_history are the two explicit file exceptions:
 // mycli appends its own log and history there and is otherwise a read-only client.
+// ~/Projects/ai-docs/reviews is allowed so review ledgers remain writable when needed.
 const MYCLI_WRITE_PATHS = [".mycli.log", ".mycli_history"].map((name) =>
   path.join(os.homedir(), name),
 );
+const REVIEW_LEDGER_DIR = path.join(os.homedir(), "Projects", "ai-docs", "reviews");
 const ASK_MODE_SANDBOX_PROFILE =
   "(version 1)" +
   "(allow default)" +
   "(deny file-write*)" +
-  '(allow file-write* (subpath "/private/tmp") (subpath "/private/var/folders") (literal "/dev/null") (subpath "/dev/fd") ' +
+  '(allow file-write* (subpath "/tmp") (subpath "/private/tmp") (subpath "/var/folders") (subpath "/private/var/folders") (literal "/dev/null") (subpath "/dev/fd") ' +
+  `(subpath ${JSON.stringify(REVIEW_LEDGER_DIR)}) ` +
   `${MYCLI_WRITE_PATHS.map((p) => `(literal ${JSON.stringify(p)})`).join(" ")})`;
 
 function sandboxShellQuote(command: string): string {
@@ -201,8 +204,13 @@ export default function askModeExtension(pi: ExtensionAPI): void {
     }
   }
 
-  // Session start: restore persisted state or default to Ask mode
+  // Session start: restore persisted state or default to Ask mode.
+  // In subagent children, preserve an explicit inherited ASK entry (`enabled: true`)
+  // so forked writers (`worker`/`delegate`) stay read-only when the parent was in
+  // Ask Mode, while ignoring inherited EDIT entries (`enabled: false`) so read-only
+  // forked children (`oracle`) never inherit write access from an EDIT-mode parent.
   pi.on("session_start", (_event, ctx) => {
+    const isSubagentChild = process.env.PI_SUBAGENT_CHILD === "1";
     const entries = ctx.sessionManager?.getEntries?.() ?? [];
     const lastEntry = entries
       .filter(
@@ -213,13 +221,14 @@ export default function askModeExtension(pi: ExtensionAPI): void {
       | { data?: { enabled?: boolean; toolsBeforeAskMode?: string[] } }
       | undefined;
 
-    if (lastEntry?.data?.enabled === undefined) {
+    const restoredEnabled = lastEntry?.data?.enabled;
+    if (restoredEnabled === undefined || (isSubagentChild && restoredEnabled === false)) {
       askModeEnabled = true;
       toolsBeforeAskMode = undefined;
       modeExplicit = false;
     } else {
-      askModeEnabled = lastEntry.data.enabled;
-      toolsBeforeAskMode = lastEntry.data.toolsBeforeAskMode;
+      askModeEnabled = restoredEnabled;
+      toolsBeforeAskMode = lastEntry?.data?.toolsBeforeAskMode;
       modeExplicit = true;
     }
 
@@ -263,6 +272,9 @@ export default function askModeExtension(pi: ExtensionAPI): void {
 
   // Extra safety guard: block edit/write tool calls if invoked in Ask Mode,
   // and sandbox every bash command read-only at the OS level.
+  // Track exact wrapped strings by input object so same-event re-entry does not
+  // double-wrap, while caller-supplied `/usr/bin/sandbox-exec` commands are still wrapped.
+  const wrappedBashInputs = new WeakMap<object, string>();
   pi.on("tool_call", (event: ToolCallEvent) => {
     if (!askModeEnabled) return undefined;
 
@@ -275,7 +287,11 @@ export default function askModeExtension(pi: ExtensionAPI): void {
 
     if (event.toolName === "bash") {
       const command = event.input.command as string;
-      event.input.command = `/usr/bin/sandbox-exec -p ${sandboxShellQuote(ASK_MODE_SANDBOX_PROFILE)} /bin/bash -c ${sandboxShellQuote(command)}`;
+      if (wrappedBashInputs.get(event.input) !== command) {
+        const wrapped = `/usr/bin/sandbox-exec -p ${sandboxShellQuote(ASK_MODE_SANDBOX_PROFILE)} /usr/bin/env GIT_OPTIONAL_LOCKS=0 /bin/bash -c ${sandboxShellQuote(command)}`;
+        event.input.command = wrapped;
+        wrappedBashInputs.set(event.input, wrapped);
+      }
     }
     return undefined;
   });
