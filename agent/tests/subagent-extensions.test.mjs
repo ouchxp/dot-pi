@@ -467,13 +467,13 @@ test("applyReviewerPolicy patches bundled reviewer prompt idempotently", () => {
   assert.equal(applyReviewerPolicy(patched), patched);
 
   const gptPatched = applyReviewerPolicy(bundled, {
-    modelId: "group/gpt-6-2-astra",
+    modelId: "group/gpt-astra",
   });
   assert.doesNotMatch(gptPatched, /Anchor investigation to the diff/);
   assert.match(gptPatched, /## Finding classification and kind/);
 
   const claudePatched = applyReviewerPolicy(bundled, {
-    modelId: "group/claude-opus-5-5",
+    modelId: "group/claude-opus",
   });
   assert.match(claudePatched, /Anchor investigation to the diff/);
 });
