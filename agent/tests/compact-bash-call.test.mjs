@@ -7,7 +7,7 @@ import { pathToFileURL } from "node:url";
 const piTuiEntry = pathToFileURL(
 	path.resolve(
 		import.meta.dirname,
-		"../install/releases/1.5.2/node_modules/@earendil-works/pi-tui/dist/index.js",
+		"../install/releases/1.6.0/node_modules/@earendil-works/pi-tui/dist/index.js",
 	),
 ).href;
 
@@ -122,7 +122,7 @@ test("codemode script summarizes called tools with counts", () => {
 	assert.equal(summary.summary, "bash×3 · lens_diagnostics");
 });
 
-test("bash stays expanded while running, collapses to 1 bordered row when done (including errors), and expands on click", () => {
+test("bash previews 3 input / 5 output lines while running, collapses to 1 bordered row when done (including errors), and expands on click", () => {
 	const resolver = loadResolver();
 	let lastCallArgs;
 	let lastResultExpanded;
@@ -143,16 +143,17 @@ test("bash stays expanded while running, collapses to 1 bordered row when done (
 	const wrapped = resolver("bash", () => base);
 	assert.equal(wrapped.renderShell, "self");
 	const longScript = "cd /repo\nnpm run lint\nnpm run test\ngit diff";
+	const longOutput = "line 1\nline 2\nline 3\nline 4\nline 5\nline 6\nline 7";
 	const rowState = {};
 
-	// Running (isPartial=true): expanded call + expanded result share one border via ├─┤.
+	// Running (isPartial=true): preview caps call to 3 lines and result to 5 lines + hidden-lines notice.
 	const runningCall = wrapped.renderCall(
 		{ command: longScript },
 		theme,
 		{ isPartial: true, expanded: false, state: rowState, lastComponent: undefined },
 	);
 	const runningResult = wrapped.renderResult(
-		{ content: [{ type: "text", text: "live line 1\nlive line 2" }] },
+		{ content: [{ type: "text", text: longOutput }] },
 		{ isPartial: true, expanded: false },
 		theme,
 		{ isPartial: true, expanded: false, state: rowState },
@@ -163,11 +164,14 @@ test("bash stays expanded while running, collapses to 1 bordered row when done (
 	const runningCallLines = runningCall.render(60);
 	const runningResultLines = runningResult.render(60);
 	assert.equal(runningCallLines[0], `┌${"─".repeat(58)}┐`);
-	assert.equal(runningCallLines.length, 5); // top border + 4 command lines (bottom suppressed by result)
+	assert.deepEqual(
+		runningCallLines.slice(1).map(stripBoxSides),
+		["● $ cd /repo", "npm run lint", "npm run test", "… (+1 line)"],
+	);
 	assert.equal(runningResultLines[0], `├${"─".repeat(58)}┤`);
 	assert.deepEqual(
 		runningResultLines.slice(1, -1).map(stripBoxSides),
-		["live line 1", "live line 2"],
+		["line 1", "line 2", "line 3", "line 4", "line 5", "… (+2 lines)"],
 	);
 	assert.equal(runningResultLines.at(-1), `└${"─".repeat(58)}┘`);
 
@@ -191,14 +195,14 @@ test("bash stays expanded while running, collapses to 1 bordered row when done (
 	assert.equal(collapsedLines[2], `└${"─".repeat(58)}┘`);
 	assert.deepEqual(collapsedResult.render(60), []);
 
-	// Clicked / expanded: full call + divider + full result.
+	// Clicked / expanded: full call + divider + full result (no preview cap).
 	const expandedCall = wrapped.renderCall(
 		{ command: longScript },
 		theme,
 		{ isPartial: false, expanded: true, state: rowState, lastComponent: collapsedCall },
 	);
 	const expandedResult = wrapped.renderResult(
-		{ content: [{ type: "text", text: "full output" }] },
+		{ content: [{ type: "text", text: longOutput }] },
 		{ isPartial: false, expanded: true },
 		theme,
 		{ isPartial: false, expanded: true, state: rowState, lastComponent: collapsedResult },
@@ -206,8 +210,11 @@ test("bash stays expanded while running, collapses to 1 bordered row when done (
 	assert.equal(lastCallArgs.command, longScript);
 	assert.equal(expandedCall.render(60).length, 5);
 	assert.equal(expandedResult.render(60)[0], `├${"─".repeat(58)}┤`);
-	assert.equal(stripBoxSides(expandedResult.render(60)[1]), "full output");
-	assert.equal(expandedResult.render(60)[2], `└${"─".repeat(58)}┘`);
+	assert.deepEqual(
+		expandedResult.render(60).slice(1, -1).map(stripBoxSides),
+		["line 1", "line 2", "line 3", "line 4", "line 5", "line 6", "line 7"],
+	);
+	assert.equal(expandedResult.render(60).at(-1), `└${"─".repeat(58)}┘`);
 });
 
 test("codemode stays expanded while running, collapses to 1 bordered row when done, and expands on click", () => {
@@ -406,9 +413,13 @@ test("patchBorderedToolStack removes blank gap and merges adjacent tool boxes wi
 		assert.equal(stripBoxSides(lines[5]), "● read c.ts");
 		assert.equal(lines[6], `└${"─".repeat(22)}┘`);
 
-		// Mouse layout reflects merged heights (3, 2, 2).
+		// Mouse layout reflects merged heights (3, 2, 2) in both legacy mouseLayout and Pi 1.6 childLines.
 		assert.deepEqual(
 			container.mouseLayout.children.map((c) => c.height),
+			[3, 2, 2],
+		);
+		assert.deepEqual(
+			container.childLines.parts.map((p) => p.length),
 			[3, 2, 2],
 		);
 
@@ -560,10 +571,10 @@ test("tool calls render with no background fill and status-colored ● + tool na
 
 test("concurrent pending tools stop invalidating each other and keep the newest result expanded", async (context) => {
 	const { ToolExecutionComponent } = await import(
-		"../install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tool-execution.js"
+		"../install/releases/1.6.0/node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tool-execution.js"
 	);
 	const { initTheme } = await import(
-		"../install/releases/1.5.2/node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/theme/theme.js"
+		"../install/releases/1.6.0/node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/theme/theme.js"
 	);
 	initTheme("dark");
 	const resolver = loadResolver();
@@ -611,7 +622,7 @@ test("concurrent pending tools stop invalidating each other and keep the newest 
 	assert.equal(stripBoxSides(latestOutputLine), "latest output");
 });
 
-test("last tool call stays expanded after finishing until a newer tool call starts (and still toggles on click)", async () => {
+test("last tool call previews 3 input / 5 output lines, toggles preview <-> full on click, and collapses when superseded", async () => {
 	const resolver = loadResolver();
 	const wrapped = resolver("bash", () => ({
 		renderCall(args, _theme, context) {
@@ -624,11 +635,12 @@ test("last tool call stays expanded after finishing until a newer tool call star
 		},
 	}));
 
-	const script = "cd /repo\nnpm run lint\nnpm run test";
+	const script = "cd /repo\nnpm run lint\nnpm run test\ngit status\ngit diff";
+	const output = "out 1\nout 2\nout 3\nout 4\nout 5\nout 6\nout 7";
 	const state1 = {};
 	let invalidated1 = 0;
 
-	// Tool 1 starts running.
+	// Tool 1 starts running: immediately capped to 3 input lines + notice.
 	const call1Running = wrapped.renderCall({ command: script }, theme, {
 		toolCallId: "call-1",
 		isPartial: true,
@@ -638,9 +650,12 @@ test("last tool call stays expanded after finishing until a newer tool call star
 			invalidated1++;
 		},
 	});
-	assert.equal(call1Running.render(60).length, 5); // top + 3 lines + bottom
+	assert.deepEqual(
+		call1Running.render(60).slice(1, -1).map(stripBoxSides),
+		["● $ cd /repo", "npm run lint", "npm run test", "… (+2 lines)"],
+	);
 
-	// Tool 1 finishes: still the latest tool call, so it stays expanded with output.
+	// Tool 1 finishes: still the latest tool call, so it stays in 3/5 preview mode.
 	const call1Done = wrapped.renderCall({ command: script }, theme, {
 		toolCallId: "call-1",
 		isPartial: false,
@@ -649,15 +664,21 @@ test("last tool call stays expanded after finishing until a newer tool call star
 		lastComponent: call1Running,
 	});
 	const res1Done = wrapped.renderResult(
-		{ content: [{ type: "text", text: "all passed" }] },
+		{ content: [{ type: "text", text: output }] },
 		{ isPartial: false, expanded: false },
 		theme,
 		{ toolCallId: "call-1", isPartial: false, expanded: false, state: state1 },
 	);
-	assert.equal(call1Done.render(60).length, 4); // top + 3 lines (bottom suppressed by result)
-	assert.equal(stripBoxSides(res1Done.render(60)[1]), "all passed");
+	assert.deepEqual(
+		call1Done.render(60).slice(1).map(stripBoxSides),
+		["● $ cd /repo", "npm run lint", "npm run test", "… (+2 lines)"],
+	);
+	assert.deepEqual(
+		res1Done.render(60).slice(1, -1).map(stripBoxSides),
+		["out 1", "out 2", "out 3", "out 4", "out 5", "… (+2 lines)"],
+	);
 
-	// User clicks the latest tool call (expanded flips false -> true): toggles collapsed.
+	// User clicks the latest tool call (expanded flips false -> true): toggles preview -> full expanded.
 	const call1Clicked = wrapped.renderCall({ command: script }, theme, {
 		toolCallId: "call-1",
 		isPartial: false,
@@ -666,16 +687,44 @@ test("last tool call stays expanded after finishing until a newer tool call star
 		lastComponent: call1Done,
 	});
 	const res1Clicked = wrapped.renderResult(
-		{ content: [{ type: "text", text: "all passed" }] },
+		{ content: [{ type: "text", text: output }] },
 		{ isPartial: false, expanded: true },
 		theme,
-		{ toolCallId: "call-1", isPartial: false, expanded: true, state: state1 },
+		{ toolCallId: "call-1", isPartial: false, expanded: true, state: state1, lastComponent: res1Done },
 	);
-	assert.equal(call1Clicked.render(60).length, 3);
-	assert.equal(stripBoxSides(call1Clicked.render(60)[1]), "● $ npm lint · npm test (3 lines)");
-	assert.deepEqual(res1Clicked.render(60), []);
+	assert.deepEqual(
+		call1Clicked.render(60).slice(1).map(stripBoxSides),
+		["● $ cd /repo", "npm run lint", "npm run test", "git status", "git diff"],
+	);
+	assert.deepEqual(
+		res1Clicked.render(60).slice(1, -1).map(stripBoxSides),
+		["out 1", "out 2", "out 3", "out 4", "out 5", "out 6", "out 7"],
+	);
 
-	// Tool 2 starts running: Tool 1 gets invalidated and collapses; Tool 2 stays expanded when done.
+	// User clicks again (expanded flips true -> false): toggles full expanded -> preview.
+	const call1PreviewAgain = wrapped.renderCall({ command: script }, theme, {
+		toolCallId: "call-1",
+		isPartial: false,
+		expanded: false,
+		state: state1,
+		lastComponent: call1Clicked,
+	});
+	const res1PreviewAgain = wrapped.renderResult(
+		{ content: [{ type: "text", text: output }] },
+		{ isPartial: false, expanded: false },
+		theme,
+		{ toolCallId: "call-1", isPartial: false, expanded: false, state: state1, lastComponent: res1Clicked },
+	);
+	assert.deepEqual(
+		call1PreviewAgain.render(60).slice(1).map(stripBoxSides),
+		["● $ cd /repo", "npm run lint", "npm run test", "… (+2 lines)"],
+	);
+	assert.deepEqual(
+		res1PreviewAgain.render(60).slice(1, -1).map(stripBoxSides),
+		["out 1", "out 2", "out 3", "out 4", "out 5", "… (+2 lines)"],
+	);
+
+	// Tool 2 starts running: Tool 1 gets invalidated and collapses to 1 line; Tool 2 previews when done.
 	const state2 = {};
 	wrapped.renderCall({ command: script }, theme, {
 		toolCallId: "call-2",
@@ -689,21 +738,22 @@ test("last tool call stays expanded after finishing until a newer tool call star
 	const call1AfterTool2 = wrapped.renderCall({ command: script }, theme, {
 		toolCallId: "call-1",
 		isPartial: false,
-		expanded: true, // Pi still holds expanded=true from the click that collapsed call-1 while latest
+		expanded: false,
 		state: state1,
-		lastComponent: call1Clicked,
+		lastComponent: call1PreviewAgain,
 	});
-	assert.equal(call1AfterTool2.render(60).length, 3, "manually collapsed latest tool must stay collapsed when superseded");
+	assert.equal(call1AfterTool2.render(80).length, 3);
+	assert.equal(stripBoxSides(call1AfterTool2.render(80)[1]), "● $ npm lint · npm test · git status · git diff (5 lines)");
 
-	// Clicking call-1 again now toggles expanded true -> false and opens it.
+	// Clicking call-1 again toggles collapsed -> full expanded.
 	const call1Reopened = wrapped.renderCall({ command: script }, theme, {
 		toolCallId: "call-1",
 		isPartial: false,
-		expanded: false,
+		expanded: true,
 		state: state1,
 		lastComponent: call1AfterTool2,
 	});
-	assert.equal(call1Reopened.render(60).length, 5);
+	assert.equal(call1Reopened.render(80).length, 7); // top + 5 lines + bottom
 
 	const res2Done = wrapped.renderResult(
 		{ content: [{ type: "text", text: "tool 2 output" }] },
@@ -788,6 +838,99 @@ test("historical thinking blocks auto-collapse while the last thinking block sta
 		]);
 		assert.equal(msg2.updateCalls, 1);
 		assert.equal(msg3.updateCalls, 0);
+	} finally {
+		restore();
+	}
+});
+
+test("clicking a latest tool inside real Pi 1.6 Container + ToolExecutionComponent toggles preview <-> full expanded", async () => {
+	const { ToolExecutionComponent } = await import(
+		"../install/releases/1.6.0/node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tool-execution.js"
+	);
+	const { initTheme } = await import(
+		"../install/releases/1.6.0/node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/theme/theme.js"
+	);
+	initTheme("dark");
+
+	const resolver = loadResolver();
+	const restore = patchBorderedToolStack(ToolExecutionComponent.prototype, Container.prototype);
+	try {
+		const renderers = resolver("bash", () => ({
+			renderCall(args, _theme, ctx) {
+				const text = ctx.lastComponent ?? new Text("", 0, 0);
+				text.setText(`$ ${args.command}`);
+				return text;
+			},
+			renderResult(result) {
+				return new Text(result.content[0]?.text ?? "", 0, 0);
+			},
+		}));
+
+		const makeTool = (id, cmd, out) => {
+			const comp = new ToolExecutionComponent(
+				"bash",
+				id,
+				{ command: cmd },
+				{},
+				renderers,
+				{ requestRender() {} },
+				process.cwd(),
+			);
+			comp.updateResult({ content: [{ type: "text", text: out }] }, false);
+			return comp;
+		};
+
+		const older = makeTool("t-1", "echo 1\necho 2\necho 3\necho 4", "a\nb");
+		const latest = makeTool(
+			"t-2",
+			"line1\nline2\nline3\nline4\nline5",
+			"out1\nout2\nout3\nout4\nout5\nout6\nout7",
+		);
+		await Promise.resolve();
+
+		const chat = new Container();
+		chat.addChild(older);
+		chat.addChild(latest);
+
+		const beforeLines = chat.render(60);
+		assert.deepEqual(
+			chat.childLines?.parts.map((p) => p.length),
+			[3, 12],
+		);
+		assert.ok(beforeLines.some((l) => l.includes("… (+2 lines)")));
+
+		// Click on a row inside `latest` (below the 3-row collapsed `older` block).
+		const clickEvent = {
+			type: "click",
+			button: "left",
+			x: 5,
+			y: 4,
+			screenX: 5,
+			screenY: 4,
+			width: 60,
+			height: beforeLines.length,
+			shift: false,
+			alt: false,
+			ctrl: false,
+		};
+		const clickResult = chat.handleMouse(clickEvent);
+		assert.equal(clickResult?.handled, true);
+		assert.equal(latest.expanded, true);
+
+		const expandedLines = chat.render(60);
+		assert.ok(!expandedLines.some((l) => l.includes("… (+2 lines)")), `expected full output without preview notice, got:\n${expandedLines.join("\n")}`);
+		assert.ok(expandedLines.some((l) => l.includes("out7")), `expected out7 in expanded view, got:\n${expandedLines.join("\n")}`);
+
+		// Click again to toggle back to preview.
+		const collapseResult = chat.handleMouse({
+			...clickEvent,
+			height: expandedLines.length,
+		});
+		assert.equal(collapseResult?.handled, true);
+		assert.equal(latest.expanded, false);
+
+		const previewAgainLines = chat.render(60);
+		assert.ok(previewAgainLines.some((l) => l.includes("… (+2 lines)")));
 	} finally {
 		restore();
 	}

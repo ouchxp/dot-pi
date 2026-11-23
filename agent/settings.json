@@ -179,11 +179,11 @@
     "-./extensions/cursor-acp.ts"
   ],
   "extensionChangelogVersions": {
-    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.89.1",
-    "{\"source\":\"npm:pi-lens\",\"scope\":\"user\"}": "4.5.1",
+    "{\"source\":\"npm:pi-subagents\",\"scope\":\"user\"}": "0.90.0",
+    "{\"source\":\"npm:pi-lens\",\"scope\":\"user\"}": "4.5.2",
     "{\"source\":\"npm:pi-web-access\",\"scope\":\"user\"}": "0.48.0",
     "{\"source\":\"npm:pi-tool-display\",\"scope\":\"user\"}": "0.5.0",
-    "{\"source\":\"npm:@narumitw/pi-btw\",\"scope\":\"user\"}": "0.63.8"
+    "{\"source\":\"npm:@narumitw/pi-btw\",\"scope\":\"user\"}": "0.63.9"
   },
   "outputPad": 0
 }
