@@ -3,12 +3,22 @@
     "cjs/**",
     "dist/**",
     "build/**",
-    "gogo-web/**",
     "testData/**",
     "uploads/**"
   ],
   "tools": {
     "lsp_navigation": {
+      "enabled": false
+    }
+  },
+  "format": {
+    "enabled": false
+  },
+  "autofix": {
+    "enabled": false
+  },
+  "actionableWarnings": {
+    "autoFix": {
       "enabled": false
     }
   }
