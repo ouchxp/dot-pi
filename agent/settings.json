@@ -1,7 +1,7 @@
 {
-  "defaultModel": "group/gemini-4-neon",
+  "defaultModel": "group/gemini-4-hydrogen",
   "defaultProvider": "magpie",
-  "lastChangelogVersion": "1.6.0",
+  "lastChangelogVersion": "1.6.1",
   "theme": "dark",
   "defaultThinkingLevel": "max",
   "modelThinkingLevels": {

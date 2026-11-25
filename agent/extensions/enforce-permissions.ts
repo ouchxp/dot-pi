@@ -59,11 +59,11 @@ type BashDenyRule = {
 const BASH_DENY_RULES: BashDenyRule[] = [
   {
     pattern:
-      /(^|[;&|()\s])\s*git((?:\s+(?:-C|--git-dir|--work-tree|--namespace|-c|--exec-path)\s+(?:[^\s|;&\\'"]+|'[^']*'|"[^"]*")+|\s+--[^\s|;&\\]+|\s+-[^\s|;&\\]+)*)\s+(?<op>add|commit|push|pull|checkout|restore|reset|clean|stash(?!\s+(?:list|show)(?![-\w]))|rebase|merge|cherry-pick|revert|apply|am)(?![-\w])/i,
+      /(^|[;&|()\s])\s*git((?:\s+(?:-C|--git-dir|--work-tree|--namespace|-c|--exec-path)\s+(?:[^\s|;&\\'"]|'[^']*'|"[^"]*")+|\s+--[^\s|;&\\]+|\s+-[^\s|;&\\]+)*)\s+(?<op>add|commit|push|pull|checkout|restore|reset|clean|stash(?!\s+(?:list|show)(?![-\w]))|rebase|merge|cherry-pick|revert|apply|am)(?![-\w])/i,
     label: (match) => `git ${match.groups?.op ?? "mutation"}`,
   },
   {
-    pattern: /(^|[;&|()\s])\s*git(\s+[^\s|;&\\]*)*\s+branch\s+-[dD]\b/,
+    pattern: /(^|[;&|()\s])\s*git(?:\s+[^\s|;&\\]+)*\s+branch\s+-[dD]\b/,
     label: () => "git branch -d/-D",
   },
   { pattern: /(^|[;&|()\s])\s*rm(\s+|$)/, label: () => "rm" },
