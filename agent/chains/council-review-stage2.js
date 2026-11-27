@@ -43,7 +43,7 @@ function normClaim(s) {
 function fpClaim(s) {
   return normClaim(s)
     .replace(/^\[p[0123]\]\s*/, "")
-    .replace(/^\[(in-scope|regression|pre-existing|preexisting)\]\s*/, "")
+    .replace(/^\[(in-scope|regression|pre-existing|preexisting|surfaced)\]\s*/, "")
     .replace(/^\[p[0123]\]\s*/, "");
 }
 
@@ -267,7 +267,7 @@ for (let i = 0; i < upheld.length; i++) {
       r.finding.lines +
       " — " +
       r.finding.claim.replace(
-        /^\[p[0123]\]\s*\[(?:in-scope|regression|pre-existing)\]\s*/i,
+        /^\[p[0123]\]\s*\[(?:in-scope|regression|pre-existing|surfaced)\]\s*/i,
         "",
       ) +
       (r.finding.isNew ? " (new)" : " (previous round)"),

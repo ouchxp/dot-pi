@@ -167,6 +167,7 @@ function normalizeSeverity(s) {
 
 function normalizeClassification(s) {
   const v = String(s || "").toLowerCase();
+  if (v.indexOf("surfaced") >= 0) return "[surfaced]";
   if (v.indexOf("regression") >= 0) return "[regression]";
   if (v.indexOf("pre-existing") >= 0 || v.indexOf("preexisting") >= 0)
     return "[pre-existing]";
@@ -180,7 +181,7 @@ function syncClaimTags(claim, severity, classification) {
   let rest = String(claim || "").trim();
   rest = rest
     .replace(/^\s*\[p[0123]\]\s*/i, "")
-    .replace(/^\s*\[(in-scope|regression|pre-existing|preexisting)\]\s*/i, "")
+    .replace(/^\s*\[(in-scope|regression|pre-existing|preexisting|surfaced)\]\s*/i, "")
     .replace(/^\s*\[p[0123]\]\s*/i, "");
   return sevTag + " " + classification + " " + rest;
 }

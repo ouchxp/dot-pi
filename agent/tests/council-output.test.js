@@ -27,7 +27,22 @@ test("council output keeps IDs internal and displays all three tags", async () =
     classification: "[in-scope]",
     kind: "bug",
   };
-  const first = await review([finding]);
+  const surfaced = {
+    file: "grocery-list-utils.js",
+    lines: "204",
+    claim: "[P3] [surfaced] the new callback sends existing draft edits as saved items",
+    severity: "P3",
+    classification: "[surfaced]",
+    kind: "req",
+  };
+  const repeat = {
+    ...surfaced,
+    classification: "[in-scope]",
+    claim: surfaced.claim.replace("[surfaced]", "[in-scope]"),
+  };
+  const first = await review([finding, surfaced, repeat]);
+  assert.equal(first.findings[1].classification, "[surfaced]");
+  assert.equal(first.findings[1].claim, surfaced.claim);
   assert.equal(first.parseFailures.length, 0);
   assert.equal(first.findings[0].kind, "bug");
   assert.match(first.findings[0].id, /^R1-/);
@@ -46,6 +61,11 @@ test("council output keeps IDs internal and displays all three tags", async () =
   assert.match(
     second.chairmanTask,
     /^\[P2\] \[in-scope\] \[bug\] models\/Ride\.ts 12-16 — unpaid rides lose tips \(new\)$/m,
+  );
+  assert.equal(second.duplicateCount, 1);
+  assert.match(
+    second.chairmanTask,
+    /^\[P3\] \[surfaced\] \[req\] grocery-list-utils\.js 204 — the new callback sends existing draft edits as saved items \(new\)$/m,
   );
   assert.doesNotMatch(second.chairmanTask, /R1-r1-/);
   assert.equal(JSON.parse(first.stage2Payload).findings[0].kind, "bug");

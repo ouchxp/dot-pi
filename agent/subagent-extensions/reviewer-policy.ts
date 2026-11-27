@@ -7,7 +7,7 @@
  *     enforced by `static-review-guard.ts`; filesystem writes outside temp and
  *     the review ledger are kernel-blocked by `ask-mode.ts`)
  *   - Scope-anchoring and token-efficiency rules
- *   - Finding classification (`[pre-existing]`, `[in-scope]`, `[regression]`)
+ *   - Finding classification (`[pre-existing]`, `[in-scope]`, `[regression]`, `[surfaced]`)
  *   - Finding kind (`[req]`, `[bug]`, `[risk]`, `[opinion]`, `[cleanup]`)
  *   - Review ledger, simplicity, and P2 fix-cost rules
  *
@@ -58,7 +58,8 @@ Every reader-facing finding and fix update states exactly one classification tag
 - Classification:
   - \`[pre-existing]\` — existed before the reviewed change (verify with \`git show HEAD:<file>\` when in doubt). Report it, do not fix it.
   - \`[in-scope]\` — part of the current task/ticket. Must be fixed.
-  - \`[regression]\` — caused or made reachable by the reviewed change. Must be fixed; state the root cause.
+  - \`[regression]\` — the change breaks previously working behavior. Must be fixed. State the root cause.
+  - \`[surfaced]\` — the change exposes existing behavior through a new in-scope path or materially broadens its impact. Verify the baseline and describe the new impact. Preserve the classification in fix updates.
 - Kind: \`[req]\` (named requirement mismatch), \`[bug]\` (incorrect processing), \`[risk]\` (plausible timing or edge hazard), \`[opinion]\` (preference), or \`[cleanup]\` (dead or stale code).
 - Do not display finding IDs; keep them in ledgers only.
 

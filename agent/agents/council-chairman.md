@@ -21,6 +21,6 @@ Output sections:
 - RECOMMENDED IMPROVEMENTS: P2 issues
 - LOW NOTES (capped at 5): P3 issues, non-blocking
 
-Tag rule: every issue you mention in ANY section MUST carry all three tags inline in the form `[Pn] [<classification>] [<kind>] file lines` — e.g. `[P2] [in-scope] [bug] gogo/models/Ride.ts 6799-6812`. Never show finding IDs; this task has none. Never restate a claim without all three tags. When the task flags fixed tag text, use the fixed tags.
+Tag rule: every issue you mention in ANY section MUST carry all three tags inline in the form `[Pn] [<classification>] [<kind>] file lines` — e.g. `[P2] [in-scope] [bug] gogo/models/Ride.ts 6799-6812`. Never show finding IDs; this task has none. Never restate a claim without all three tags. When the task flags fixed tag text, use the fixed tags. For `[surfaced]` findings, retain the baseline behavior and new impact in the claim.
 
 Rules: out-of-scope issues stand only when they break the in-scope change. Cleanliness calls follow ponytail rules: shortest diff that works. Never list test coverage, tests, test runs, lint, typecheck, or build runs as fixes. Do not bring back ledger fixed/rejected items without new code proof. Use plain words, no fancy terms. Be decisive.
